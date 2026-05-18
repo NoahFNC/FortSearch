@@ -1,118 +1,181 @@
-
 // =========================
 // VARIABLES
 // =========================
 
-const skinHub =
-  document.getElementById("SkinHub");
+const skinHub = document.getElementById("SkinHub");
 
-const searchBar =
-  document.getElementById("SearchBar");
+const searchBar = document.getElementById("SearchBar");
 
-const tagList =
-  document.getElementById("TagList");
+const tagList = document.getElementById("TagList");
 
-const skinOverlay =
-  document.getElementById("SkinOverlay");
+const skinOverlay = document.getElementById("SkinOverlay");
 
-const overlaySkinName =
-  document.getElementById("OverlaySkinName");
+const overlaySkinName = document.getElementById("OverlaySkinName");
 
-const skinVideo =
-  document.getElementById("SkinVideo");
+const skinVideo = document.getElementById("SkinVideo");
 
-const closeButton =
-  document.getElementById("CloseButton");
-
+const closeButton = document.getElementById("CloseButton");
 
 let activeTags = [];
 
-
 // =========================
-// TAG SYSTEM
-// =========================
-
-const allTags = [
-
-  ...new Set(
-    skins.flatMap((skin) => skin.Tags)
-  )
-
-];
-
-
-// =========================
-// CREATE TAGS
+// TAG CATEGORIES
 // =========================
 
-allTags.forEach((tag) => {
+const tagCategories = {
+  Gender: ["Male", "Female", "Young Male", "Unisex"],
 
-  const tagElement =
-    document.createElement("div");
+  "Art Style": ["Cartoon", "Cell shaded", "Anime"],
 
-  tagElement.classList.add("FilterTag");
+  Hair: [
+    "Fade",
+    "Short Hair",
+    "Long Hair",
+    "Spiky Hair",
+    "Ponytail",
+    "Dreads",
+    "Unique Hairstyle",
+    "Bald",
+  ],
 
-  tagElement.textContent = tag;
+  Fashion: [
+    "Streetwear",
+    "Luxury",
+    "Casual",
+    "Suit",
+    "Jacket",
+    "Skirt",
+    "Hood",
+    "Hat",
+    "Mask",
+    "Bandanna",
+  ],
 
+  Accessories: [
+    "Necklace",
+    "Bracelet",
+    "Earrings",
+    "Nose Ring",
+    "Piercings",
+    "Nails",
+    "Goggles",
+    "Visor Glasses",
+  ],
 
-  tagElement.addEventListener("click", () => {
+  Themes: [
+    "Futuristic",
+    "Military",
+    "Tactical",
+    "Horror",
+    "Royalty",
+    "School",
+    "Apocalyptic",
+  ],
 
-    tagElement.classList.toggle("Active");
+  Body: ["Robot", "Cybernetic", "Cyborg", "Slim", "Brute"],
 
+  Age: ["Young", "Middle", "Old"],
 
-    if (activeTags.includes(tag)) {
+  "Skin Tone": ["Dark Skin", "Light Brown Skin"],
 
-      activeTags =
-        activeTags.filter((t) => t !== tag);
-    }
+  Series: ["Marvel", "Star Wars", "Icon Series", "Gaming Legends Series"],
 
-    else {
+  "Character Type": ["Superhero", "Agent", "Pilot", "Animal", "Goat", "Peely"],
 
-      activeTags.push(tag);
-    }
+  Region: ["Asian", "Middle Eastern"],
+};
 
+// =========================
+// CREATE TAG CATEGORIES
+// =========================
 
-    filterSystem();
+Object.entries(tagCategories).forEach(([categoryName, tags]) => {
+  // CATEGORY CONTAINER
+
+  const category = document.createElement("div");
+
+  category.classList.add("TagCategory");
+
+  // CATEGORY HEADER
+
+  const header = document.createElement("div");
+
+  header.classList.add("CategoryHeader");
+
+  header.innerHTML = `
+
+    <span>${categoryName}</span>
+    <span>+</span>
+
+  `;
+
+  // TAG CONTAINER
+
+  const tagContainer = document.createElement("div");
+
+  tagContainer.classList.add("CategoryTags");
+
+  // TOGGLE OPEN
+
+  header.addEventListener("click", () => {
+    category.classList.toggle("Open");
   });
 
+  // CREATE TAGS
 
-  tagList.appendChild(tagElement);
+  tags.forEach((tag) => {
+    const tagElement = document.createElement("div");
+
+    tagElement.classList.add("FilterTag");
+
+    tagElement.textContent = tag;
+
+    tagElement.addEventListener("click", () => {
+      tagElement.classList.toggle("Active");
+
+      if (activeTags.includes(tag)) {
+        activeTags = activeTags.filter((t) => t !== tag);
+      } else {
+        activeTags.push(tag);
+      }
+
+      filterSystem();
+    });
+
+    tagContainer.appendChild(tagElement);
+  });
+
+  category.appendChild(header);
+
+  category.appendChild(tagContainer);
+
+  tagList.appendChild(category);
 });
-
 
 // =========================
 // OPEN OVERLAY
 // =========================
 
 function openSkinOverlay(skin) {
-
   skinOverlay.style.display = "flex";
 
-  overlaySkinName.textContent =
-    skin.Identity.skin_name;
+  overlaySkinName.textContent = skin.Identity.skin_name;
 
-
-  const videoURL =
-    `https://fnggcdn.com/items/${skin.id}/video.mp4?2`;
-
+  const videoURL = `https://fnggcdn.com/items/${skin.id}/video.mp4?2`;
 
   skinVideo.src = videoURL;
 
   skinVideo.play();
 }
 
-
 // =========================
 // DISPLAY SKINS
 // =========================
 
 function displaySkins(skinArray) {
-
   skinHub.innerHTML = "";
 
-
   if (skinArray.length === 0) {
-
     skinHub.innerHTML = `
       <p class="NoResults">
         No matching skins found.
@@ -122,24 +185,16 @@ function displaySkins(skinArray) {
     return;
   }
 
-
   skinArray.forEach((skin) => {
+    const imageURL = `./Images/Skins/${skin.id}.jpg`;
 
-    const imageURL =
-      `./Images/Skins/${skin.id}.jpg`;
-
-
-    const tagHTML =
-      skin.Tags.map((tag) => {
-
-        return `
+    const tagHTML = skin.Tags.map((tag) => {
+      return `
           <span class="CardTag">
             ${tag}
           </span>
         `;
-
-      }).join("");
-
+    }).join("");
 
     skinHub.innerHTML += `
 
@@ -164,23 +219,15 @@ function displaySkins(skinArray) {
   });
 }
 
-
 // =========================
 // FILTER SYSTEM
 // =========================
 
 function filterSystem() {
+  const searchText = searchBar.value.toLowerCase().trim();
 
-  const searchText =
-    searchBar.value
-      .toLowerCase()
-      .trim();
-
-
-  const filteredSkins =
-    skins.filter((skin) => {
-
-      const searchableText = `
+  const filteredSkins = skins.filter((skin) => {
+    const searchableText = `
 
         ${skin.Identity.skin_name}
 
@@ -188,46 +235,31 @@ function filterSystem() {
 
         ${skin.Tags.join(" ")}
 
-      `
-      .toLowerCase();
+      `.toLowerCase();
 
+    const searchMatch = searchableText.includes(searchText);
 
-      const searchMatch =
-        searchableText.includes(searchText);
+    const tagMatch = activeTags.every((tag) => skin.Tags.includes(tag));
 
-
-      const tagMatch =
-
-        activeTags.every((tag) =>
-
-          skin.Tags.includes(tag)
-        );
-
-
-      return searchMatch && tagMatch;
-    });
-
+    return searchMatch && tagMatch;
+  });
 
   displaySkins(filteredSkins);
 }
-
 
 // =========================
 // SEARCH EVENT
 // =========================
 
 searchBar.addEventListener("input", () => {
-
   filterSystem();
 });
-
 
 // =========================
 // CLOSE OVERLAY
 // =========================
 
 closeButton.addEventListener("click", () => {
-
   skinOverlay.style.display = "none";
 
   skinVideo.pause();
@@ -235,11 +267,8 @@ closeButton.addEventListener("click", () => {
   skinVideo.src = "";
 });
 
-
 skinOverlay.addEventListener("click", (event) => {
-
   if (event.target === skinOverlay) {
-
     skinOverlay.style.display = "none";
 
     skinVideo.pause();
@@ -247,7 +276,6 @@ skinOverlay.addEventListener("click", (event) => {
     skinVideo.src = "";
   }
 });
-
 
 // =========================
 // INITIAL LOAD

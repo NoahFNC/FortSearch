@@ -2,168 +2,87 @@
 
 <html>
   <head>
-
     <link rel="stylesheet" href="styles.css" />
 
     <title>FortSearch</title>
-
   </head>
 
   <body>
-
     <!-- ========================= -->
     <!-- HEADER -->
     <!-- ========================= -->
 
     <div class="Header">
-
       <div class="PageTitle">
         <h1>FortSearch🔍</h1>
       </div>
 
       <div class="SponserTag">
-
-        <img
-          src="Images/Creative Corp Logo 2026.png"
-          class="CCLogo"
-        />
+        <img src="Images/Creative Corp Logo 2026.png" class="CCLogo" />
 
         <p>By Creative Corp</p>
-
       </div>
-
     </div>
-
 
     <!-- ========================= -->
     <!-- TOP SECTION -->
     <!-- ========================= -->
 
     <div class="TopSection">
-
       <!-- TAG PANEL -->
 
       <div class="TagPanel">
+        <h2 class="PanelTitle">Tags</h2>
 
-        <h2 class="PanelTitle">
-          Tags
-        </h2>
-
-        <div
-          class="TagList"
-          id="TagList"
-        >
-        </div>
-
+        <div class="TagList" id="TagList"></div>
       </div>
-
 
       <!-- SEARCH + WELCOME -->
 
       <div class="SearchWelcomeArea">
-
         <!-- SEARCH BAR -->
 
-        <input
-          type="text"
-          id="SearchBar"
-          placeholder="Search skins..."
-        />
-
+        <input type="text" id="SearchBar" placeholder="Search skins..." />
 
         <!-- WELCOME PANEL -->
 
         <div class="WelcomePanel">
-
-          <h2 class="PanelTitle">
-            Welcome
-          </h2>
+          <h2 class="PanelTitle">Welcome</h2>
 
           <p class="WelcomeText">
-
-            Search for Fortnite skins
-            using keywords and tags.
-
-            Search things like:
-
-            gold necklace,
-            dirty boots,
-            futuristic,
-            hoodie,
-            sunglasses,
-            anime hair,
-            tactical gloves,
-            and much more.
-
+            Search for Fortnite skins using keywords and tags. Search things
+            like: gold necklace, dirty boots, futuristic, hoodie, sunglasses,
+            anime hair, tactical gloves, and much more.
           </p>
-
         </div>
-
       </div>
-
     </div>
-
 
     <!-- ========================= -->
     <!-- SKIN HUB -->
     <!-- ========================= -->
 
     <div class="SkinHubContainer">
+      <h2 class="HubTitle">Skin Hub</h2>
 
-      <h2 class="HubTitle">
-        Skin Hub
-      </h2>
-
-      <div
-        class="SkinHub"
-        id="SkinHub"
-      >
-      </div>
-
+      <div class="SkinHub" id="SkinHub"></div>
     </div>
-
 
     <!-- ========================= -->
     <!-- SKIN OVERLAY -->
     <!-- ========================= -->
 
-    <div
-      class="SkinOverlay"
-      id="SkinOverlay"
-    >
-
+    <div class="SkinOverlay" id="SkinOverlay">
       <div class="OverlayContent">
+        <button class="CloseButton" id="CloseButton">✕</button>
 
-        <button
-          class="CloseButton"
-          id="CloseButton"
-        >
-          ✕
-        </button>
+        <h2 class="OverlaySkinName" id="OverlaySkinName">Skin Name</h2>
 
-        <h2
-          class="OverlaySkinName"
-          id="OverlaySkinName"
-        >
-          Skin Name
-        </h2>
-
-        <video
-          class="SkinVideo"
-          id="SkinVideo"
-          controls
-          autoplay
-          loop
-        >
-        </video>
-
+        <video class="SkinVideo" id="SkinVideo" controls autoplay loop></video>
       </div>
-
     </div>
-
 
     <script src="data.js"></script>
     <script src="script.js"></script>
-
   </body>
 </html>

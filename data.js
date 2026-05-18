@@ -3,22 +3,15 @@
 // =========================
 
 const skins = [
-
-
   {
     id: "8086",
 
     Identity: {
       skin_name: "'Mato Marauder",
-      rarity: "Rare"
+      rarity: "Rare",
     },
 
-    Tags: [
-      "Light Brown Skin",
-      "Casual",
-      "Male"
-
-          ],
+    Tags: ["Light Brown Skin", "Casual", "Male", "Fade"],
 
     SearchableTerms: [
       "fade hair",
@@ -27,77 +20,46 @@ const skins = [
       "tracksuit",
       "sneakers",
       "sweat pants",
-      
-    ]
+    ],
   },
-
 
   {
     id: "15288",
 
     Identity: {
       skin_name: "1-Ball",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Tactical",
-      "Number",
-      "Futuristic",
-      "Agent",
-      "Male"
-          ],
+    Tags: ["Tactical", "Number", "Futuristic", "Agent", "Male"],
 
-    SearchableTerms: [
-      "tactical armour"
-      
-    ]
+    SearchableTerms: ["tactical armour"],
   },
-
 
   {
     id: "15282",
 
     Identity: {
       skin_name: "10-Ball",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Tactical",
-      "Number",
-      "Futuristic",
-      "Agent",
-      "Female"
-          ],
+    Tags: ["Tactical", "Number", "Futuristic", "Agent", "Female"],
 
-    SearchableTerms: [
-      "tactical armour"
-      
-    ]
+    SearchableTerms: ["tactical armour"],
   },
-
 
   {
     id: "19251",
 
     Identity: {
       skin_name: "2-Ball",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Tactical",
-      "Number",
-      "Futuristic",
-      "Agent",
-      "Male"
-          ],
+    Tags: ["Tactical", "Number", "Futuristic", "Agent", "Male"],
 
-    SearchableTerms: [
-      "tactical armour"
-      
-    ]
+    SearchableTerms: ["tactical armour"],
   },
 
   {
@@ -105,81 +67,51 @@ const skins = [
 
     Identity: {
       skin_name: "212th Battalion Trooper",
-      rarity: "Star Wars"
+      rarity: "Star Wars",
     },
 
-    Tags: [
-      "Star Wars",
-      "Futuristic"
-          ],
+    Tags: ["Star Wars", "Futuristic"],
 
-    SearchableTerms: [
-      "armour"
-      
-    ]
+    SearchableTerms: ["armour"],
   },
-
 
   {
     id: "19532",
 
     Identity: {
       skin_name: "2D",
-      rarity: "Icon Series"
+      rarity: "Icon Series",
     },
 
-    Tags: [
-      "Cartoon",
-      "Casual"
-          ],
+    Tags: ["Cartoon", "Casual", "Spiky Hair"],
 
-    SearchableTerms: [
-      "Spiky Hair"
-      
-    ]
+    SearchableTerms: ["Spiky Hair"],
   },
-
 
   {
     id: "9544",
 
     Identity: {
       skin_name: "501st Trooper",
-      rarity: "Star Wars"
+      rarity: "Star Wars",
     },
 
-    Tags: [
-      "Star Wars",
-      "Futuristic"
-          ],
+    Tags: ["Star Wars", "Futuristic"],
 
-    SearchableTerms: [
-      "armour"
-      
-    ]
+    SearchableTerms: ["armour"],
   },
-
 
   {
     id: "19852",
 
     Identity: {
       skin_name: "7-Ball",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Tactical",
-      "Number",
-      "Futuristic",
-      "Agent",
-      "Male"
-          ],
+    Tags: ["Tactical", "Number", "Futuristic", "Agent", "Male"],
 
-    SearchableTerms: [
-      "tactical armour"
-      
-    ]
+    SearchableTerms: ["tactical armour"],
   },
 
   {
@@ -187,7 +119,7 @@ const skins = [
 
     Identity: {
       skin_name: "8-Ball vs Scratch",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
     Tags: [
@@ -196,38 +128,24 @@ const skins = [
       "Futuristic",
       "Agent",
       "Male",
-      "Military"
-          ],
+      "Military",
+      "Weapons",
+    ],
 
-    SearchableTerms: [
-      "tactical armour"
-      
-    ]
+    SearchableTerms: ["tactical armour"],
   },
-
 
   {
     id: "8459",
 
     Identity: {
       skin_name: "A Goat",
-      rarity: "Gaming Legends Series"
+      rarity: "Gaming Legends Series",
     },
 
-    Tags: [
-      "Animal",
-      "Goat",
-      "Casual",
-      "Unisex"
-          ],
+    Tags: ["Animal", "Goat", "Casual", "Unisex"],
 
-    SearchableTerms: [
-      "Horns",
-      "converse",
-      "jeans",
-      "skinny jeans"
-      
-    ]
+    SearchableTerms: ["Horns", "converse", "jeans", "skinny jeans"],
   },
 
   {
@@ -235,31 +153,20 @@ const skins = [
 
     Identity: {
       skin_name: "A.I.M.",
-      rarity: "Legendary"
+      rarity: "Legendary",
     },
 
-    Tags: [
-      "Futuristic",
-      "Robotic",
-      "apocalyptic",
-      "Male",
-      "Cyborg",
-      "Robot"
-          ],
+    Tags: ["Futuristic", "Apocalyptic", "Male", "Cyborg", "Robot"],
 
-    SearchableTerms: [
-      "machine"
-      
-    ]
+    SearchableTerms: ["machine"],
   },
-
 
   {
     id: "22090",
 
     Identity: {
       skin_name: "Aaliyah",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
     Tags: [
@@ -267,80 +174,50 @@ const skins = [
       "Female",
       "Middle Eastern",
       "Cybernetic",
-      "Cyborg"
-          ],
-
-    SearchableTerms: [
       "Necklace",
-      "Earrings"
-      
-    ]
-  },
+      "Earrings",
+    ],
 
+    SearchableTerms: ["Necklace", "Earrings"],
+  },
 
   {
     id: "11910",
 
     Identity: {
       skin_name: "Aang",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Young Male",
-      "Cartoon",
-      "Asian"
-          ],
+    Tags: ["Young Male", "Cartoon", "Asian"],
 
-    SearchableTerms: [
-      "Toga",
-      "Monk",
-      "Bald"
-      
-    ]
+    SearchableTerms: ["Toga", "Monk", "Bald"],
   },
-
 
   {
     id: "6009",
 
     Identity: {
       skin_name: "Absenz",
-      rarity: "Rare"
+      rarity: "Rare",
     },
 
-    Tags: [
-      "Horror",
-      "Hood",
-      "Male"
-          ],
+    Tags: ["Horror", "Hood", "Male"],
 
-    SearchableTerms: [
-      "Leather"
-      
-    ]
+    SearchableTerms: ["Leather"],
   },
-
 
   {
     id: "891",
 
     Identity: {
       skin_name: "Absolute Zero",
-      rarity: "Rare"
+      rarity: "Rare",
     },
 
-    Tags: [
-      "Defualt",
-      "Goggles",
-      "Facial Hair",
-      "Male"
-          ],
+    Tags: ["Defualt", "Goggles", "Facial Hair", "Male"],
 
-    SearchableTerms: [
-      "Artic"
-      
-    ]
+    SearchableTerms: ["Artic"],
   },
 
   {
@@ -348,152 +225,161 @@ const skins = [
 
     Identity: {
       skin_name: "Abstrakt",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
     Tags: [
-
       "Casual",
       "Streetwear",
       "graffiti",
       "Hood",
       "Gas mask",
       "Hat",
-      "Male"
-          ],
+      "Male",
+    ],
 
-    SearchableTerms: [
-      ""
-      
-    ]
+    SearchableTerms: [""],
   },
-
-
 
   {
     id: "8557",
 
     Identity: {
       skin_name: "Abyss",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Female",
-      "Ponytail"
-          ],
+    Tags: ["Female", "Ponytail", "Braids", "Earrings"],
 
-    SearchableTerms: [
-      "eyes",
-      "braids",
-      "bell bottoms"
-      
-    ]
+    SearchableTerms: ["eyes", "braids", "bell bottoms"],
   },
-  
 
   {
     id: "9668",
 
     Identity: {
       skin_name: "Ace Academic",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Cell shaded",
-      "School",
-      "Female",
-      "Skirt",
-      "Casual"
-          ],
+    Tags: ["Cell shaded", "School", "Female", "Skirt", "Casual", "Short Hair"],
 
-    SearchableTerms: [
-      "Academy"
-      
-    ]
+    SearchableTerms: ["Academy"],
   },
 
-
-{
+  {
     id: "16685",
 
     Identity: {
       skin_name: "Aces Wild Card",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Male",
-      "Luxury",
-      "Suit",
-      "Mask"
-          ],
+    Tags: ["Male", "Luxury", "Suit", "Mask"],
 
-    SearchableTerms: [
-      ""
-      
-    ]
+    SearchableTerms: [""],
   },
-
 
   {
     id: "22472",
 
     Identity: {
       skin_name: "Adam Smasher",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Futuristic",
-      "Robotic",
-      "Cyborg",
-      "Male"
-          ],
+    Tags: ["Futuristic", "Cyborg", "Male", "Robot"],
 
-    SearchableTerms: [
-      ""
-      
-    ]
+    SearchableTerms: [""],
   },
-
 
   {
     id: "11323",
 
     Identity: {
       skin_name: "Adanna of the Deep",
-      rarity: "Rare"
+      rarity: "Rare",
     },
 
-    Tags: [
-      "Female",
-      "Nose Ring",
-      "Dreads"
-          ],
+    Tags: ["Female", "Nose Ring", "Dreads", "Piercings", "Nails", "Dark Skin"],
 
-    SearchableTerms: [
-      ""
-      
-    ]
+    SearchableTerms: [""],
   },
 
+  {
+    id: "148",
 
+    Identity: {
+      skin_name: "Adeline",
+      rarity: "Rare",
+    },
+
+    Tags: ["Hood", "Casual", "Female", "Hat", "Visor Glasses"],
+
+    SearchableTerms: [""],
+  },
+
+  {
+    id: "7877",
+
+    Identity: {
+      skin_name: "Adira",
+      rarity: "Epic",
+    },
+
+    Tags: ["Tactical", "Female", "Unique Hairstyle"],
+
+    SearchableTerms: [""],
+  },
+
+  {
+    id: "9267",
+
+    Identity: {
+      skin_name: "Adonis Creed",
+      rarity: "Epic",
+    },
+
+    Tags: ["Dark Skin", "Male", "Athletic", "Fade", "Shorts"],
+
+    SearchableTerms: ["Boxing", "Boxer"],
+  },
+
+  {
+    id: "10819",
+
+    Identity: {
+      skin_name: "Adventure Peely",
+      rarity: "Epic",
+    },
+
+    Tags: ["Food", "Peely", "Bandanna", "Cartoon", "Goggles"],
+
+    SearchableTerms: ["banana", "yellow", "cartoon"],
+  },
+
+  {
+    id: "15577",
+
+    Identity: {
+      skin_name: "Aerial Assault Bomber",
+      rarity: "Epic",
+    },
+
+    Tags: ["Military", "Pilot", "Helmet", "Jacket"],
+
+    SearchableTerms: [""],
+  },
 
   {
     id: "261",
 
     Identity: {
       skin_name: "Midas",
-      rarity: "Legendary"
+      rarity: "Legendary",
     },
 
-    Tags: [
-      "Male",
-      "Luxury",
-      "Gold"
-    ],
+    Tags: ["Male", "Luxury", "Gold"],
 
     SearchableTerms: [
       "gold chain",
@@ -506,8 +392,8 @@ const skins = [
       "tattoos",
       "suit",
       "rich",
-      "boss"
-    ]
+      "boss",
+    ],
   },
 
   {
@@ -515,22 +401,12 @@ const skins = [
 
     Identity: {
       skin_name: "Peely",
-      rarity: "Epic"
+      rarity: "Epic",
     },
 
-    Tags: [
-      "Cartoon",
-      "Food",
-      "Male"
-    ],
+    Tags: ["Cartoon", "Food", "Male", "Peely"],
 
-    SearchableTerms: [
-      "banana",
-      "yellow",
-      "funny",
-      "cartoon",
-      "big eyes"
-    ]
+    SearchableTerms: ["banana", "yellow", "cartoon"],
   },
 
   {
@@ -538,15 +414,10 @@ const skins = [
 
     Identity: {
       skin_name: "Drift",
-      rarity: "Legendary"
+      rarity: "Legendary",
     },
 
-    Tags: [
-      "Male",
-      "Streetwear",
-      "Futuristic",
-      "Asian"
-    ],
+    Tags: ["Male", "Streetwear", "Futuristic", "Asian"],
 
     SearchableTerms: [
       "hoodie",
@@ -558,8 +429,8 @@ const skins = [
       "kitsune",
       "fox mask",
       "jacket",
-      "sun glasses"
-    ]
+      "sun glasses",
+    ],
   },
 
   {
@@ -567,21 +438,21 @@ const skins = [
 
     Identity: {
       skin_name: "Black Widow Outfit",
-      rarity: "Marvel"
+      rarity: "Marvel",
     },
 
     Tags: [
       "Female",
       "Marvel",
-      "Superhero"
+      "Superhero",
+      "Tactical",
+      "Short Hair",
+      "Military",
+      "Weapons",
     ],
 
-    SearchableTerms: [
-      "short hair",
-      "red hair"
-    ]
-  }
-
+    SearchableTerms: ["short hair", "red hair"],
+  },
 ];
 
 if (typeof module !== "undefined") {
