@@ -473,3 +473,59 @@ body {
 
   transform: scale(1.08);
 }
+
+/* ========================= */
+/* TAG CATEGORIES */
+/* ========================= */
+
+.TagPanel {
+
+  max-height: 850px;
+
+  overflow-y: auto;
+}
+
+.TagCategory {
+
+  margin-bottom: 18px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,0.08);
+
+  padding-bottom: 15px;
+}
+
+.CategoryHeader {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  color: white;
+
+  font-family: Fortnite;
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+  padding: 10px 0;
+
+  user-select: none;
+}
+
+.CategoryTags {
+
+  display: none;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top: 10px;
+}
+
+.TagCategory.Open .CategoryTags {
+
+  display: flex;
+}
