@@ -11,16 +11,22 @@ const skins = [
       rarity: "Rare",
     },
 
-    Tags: ["Light Brown Skin", "Casual", "Male", "Fade"],
-
-    SearchableTerms: [
-      "fade hair",
-      "casual outfit",
-      "camo outfut",
-      "tracksuit",
-      "sneakers",
-      "sweat pants",
+    Tags: [
+      "Middle Aged",
+      "Spry Muscular",
+      "Casual",
+      "Casual Shoes",
+      "Male",
+      "Gloveless",
+      "Fade",
+      "Sweat Pants",
+      "Light Skin",
+      "Normal",
+      "Tracksuit Jacket",
+      "Young",
     ],
+
+    SearchableTerms: [],
   },
 
   {
@@ -31,7 +37,19 @@ const skins = [
       rarity: "Epic",
     },
 
-    Tags: ["Tactical", "Number", "Futuristic", "Agent", "Male"],
+    Tags: [
+      "Knee Pads",
+      "Shoulder Pads",
+      "Chestplate",
+      "Tactical",
+      "Spry Muscular",
+      "Armor",
+      "Clean Boots",
+      "Male",
+      "Tactical Gloves",
+      "Helmet",
+      "Tactical",
+    ],
 
     SearchableTerms: ["tactical armour"],
   },
@@ -44,7 +62,21 @@ const skins = [
       rarity: "Epic",
     },
 
-    Tags: ["Tactical", "Number", "Futuristic", "Agent", "Female"],
+    Tags: [
+      "Knee Pads",
+      "Elbow Pads",
+      "Chestplate",
+      "Tactical",
+      "Slim",
+      "Armor",
+      "Armored Boots",
+      "Female",
+      "Clean Gloves",
+      "Helmet",
+      "Tactical",
+      "Ponytail",
+      "Tactical Belt",
+    ],
 
     SearchableTerms: ["tactical armour"],
   },
@@ -57,9 +89,18 @@ const skins = [
       rarity: "Epic",
     },
 
-    Tags: ["Tactical", "Number", "Futuristic", "Agent", "Male"],
+    Tags: [
+      "Tactical",
+      "Shin Guards",
+      "Muscular",
+      "Casual Shoes",
+      "Male",
+      "Armored Gloves",
+      "Jacket",
+      "Mask",
+    ],
 
-    SearchableTerms: ["tactical armour"],
+    SearchableTerms: [],
   },
 
   {
@@ -70,7 +111,28 @@ const skins = [
       rarity: "Star Wars",
     },
 
-    Tags: ["Star Wars", "Futuristic"],
+    Tags: [
+      "Knee Pads",
+      "Shin Guards",
+      "Shoulder Pads",
+      "Elbow Pads",
+      "Arm Bracers",
+      "Cuisses(Thigh Armor)",
+      "Chestplate",
+      "Military Belt",
+      "Muscular",
+      "Soldier",
+      "Armor",
+      "Casual Shoes",
+      "Male",
+      "Armored Gloves",
+      "Helmet",
+      "Underwear",
+      "Star Wars",
+      "Apocalyptic",
+      "Futuristic",
+      "Space",
+    ],
 
     SearchableTerms: ["armour"],
   },

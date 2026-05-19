@@ -23,68 +23,235 @@ let activeTags = [];
 // =========================
 
 const tagCategories = {
-  Gender: ["Male", "Female", "Young Male", "Unisex"],
-
-  "Art Style": ["Cartoon", "Cell shaded", "Anime"],
-
-  Hair: [
-    "Fade",
-    "Short Hair",
-    "Long Hair",
-    "Spiky Hair",
-    "Ponytail",
-    "Dreads",
-    "Unique Hairstyle",
-    "Bald",
-  ],
-
-  Fashion: [
-    "Streetwear",
-    "Luxury",
-    "Casual",
-    "Suit",
-    "Jacket",
-    "Skirt",
-    "Hood",
-    "Hat",
-    "Mask",
-    "Bandanna",
-  ],
 
   Accessories: [
-    "Necklace",
     "Bracelet",
     "Earrings",
+    "Glasses",
+    "Goggles",
+    "Necklace",
+    "Nails",
     "Nose Ring",
     "Piercings",
-    "Nails",
-    "Goggles",
+    "Ring",
+    "Scarf",
     "Visor Glasses",
+    "Watch"
+  ],
+
+  Age: [
+    "Middle Aged",
+    "Old",
+    "Young"
+  ],
+
+  "Art Style": [
+    "Anime",
+    "Cartoon",
+    "Cell shaded"
+  ],
+  "Armor": [
+    "Arm Bracers",
+    "Armored Vest",
+    "Chestplate",
+    "Cuisses(Thigh Armor)",
+    "Knee Pads",
+    "Shin Guards",
+    "Shoulder Pads",
+    "Elbow Pads",
+  ],
+
+  Belt: [
+    "Military Belt",
+    "Tactical Belt",
+    "Obi"
+  ],
+
+  Body: [
+    "Alien",
+    "Animal",
+    "Brute",
+    "Cybernetic",
+    "Cyborg",
+    "Heavy Muscular",
+    "Muscular",
+    "Robot",
+    "Slim",
+    "Spry Muscular"
+  ],
+
+  "Character Type": [
+    "Agent",
+    "Animal",
+    "Ninja",
+    "Peely",
+    "Pilot",
+    "Samurai",
+    "Superhero",
+    "Soldier"
+  ],
+
+  "Facial Hair": [
+    "Beard",
+    "Goatee",
+    "Mustache"
+  ],
+
+  "Fashion/Outfit": [
+    "Armor",
+    "Casual",
+    "Luxury",
+    "Medieval",
+    "Poor",
+    "Spandex",
+    "Streetwear",
+    "Suit",
+  ],
+
+  "Footwear": [
+    "Armored Boots",
+    "Barefoot",
+    "Casual Shoes",
+    "Clean Boots",
+    "Cleats",
+    "Formal Shoes",
+    "High Heels",
+    "Military Boots",
+    "Sandals",
+    "Socks"
+  ],
+
+  Gender: [
+    "Female",
+    "Male",
+    "Unisex"
+  ],
+
+  "Gloves": [
+  "Armored Gloves",
+  "Boxing Gloves",
+  "Clawed Gloves",
+  "Clean Gloves",
+  "Fingerless Gloves",
+  "Leather Gloves",
+  "Mechanical Gloves",
+  "Gloveless",
+  "Rubber Gloves",
+  "Tactical Gloves",
+  "Winter Gloves",
+],
+
+
+  Hair: [
+    "Afro",
+    "Bald",
+    "Bangs",
+    "Braids",
+    "Buzz Cut",
+    "Curly Hair",
+    "Dreads",
+    "Fade",
+    "Long Hair",
+    "Messy Hair",
+    "Mohawk",
+    "Pig Tails",
+    "Ponytail",
+    "Short Hair",
+    "Side Part",
+    "Spiky Hair",
+    "Straight Hair",
+    "Unique Hairstyle",
+    "Wavy Hair"
+  ],
+
+  "Headwear": [
+    "Bandanna",
+    "Durag",
+    "Eyepatch",
+    "Gas Mask",
+    "Glasses",
+    "Goggles",
+    "Hat",
+    "Headphones",
+    "Helmet",
+    "Hood",
+    "Mask",
+    "Visor",
+    "Visor Glasses"
+  ],
+
+  "Legwear": [
+    "Booty Shorts",
+    "Cargo Pants",
+    "Formal Pants",
+    "Jeans",
+    "Knee Pads",
+    "Pajamas",
+    "Short Jeans",
+    "Shorts",
+    "Skirts",
+    "Sweat Pants",
+    "Underwear"
+  ],
+
+  Region: [
+    "African",
+    "Asian",
+    "Middle Eastern",
+    "Norwegian"
+  ],
+
+  Series: [
+    "Anime",
+    "DC",
+    "Gaming Legends Series",
+    "Icon Series",
+    "Marvel",
+    "Star Wars",
+    "TMNT"
+  ],
+
+  "Skin Tone": [
+    "Dark Skin",
+    "Light Skin",
+    "White"
   ],
 
   Themes: [
+    "Apocalyptic",
+    "Cyberpunk",
+    "Fantasy",
     "Futuristic",
-    "Military",
-    "Tactical",
     "Horror",
+    "Military",
+    "Normal",
     "Royalty",
     "School",
-    "Apocalyptic",
+    "Space",
+    "Tactical",
+    "Medieval"
   ],
 
-  Body: ["Robot", "Cybernetic", "Cyborg", "Slim", "Brute"],
+  "Tops": [
+    "Blazer",
+    "Crop Top",
+    "Hoodie",
+    "Jacket",
+    "Shirtless",
+    "Suspenders",
+    "Sweater",
+    "Tank Top",
+    "Tracksuit Jacket",
+    "T-Shirt"
+  ],
 
-  Age: ["Young", "Middle", "Old"],
+  "Weapons": [
+    "Knife",
+    "Firearm",
+    "Grenades"
+  ]
 
-  "Skin Tone": ["Dark Skin", "Light Brown Skin"],
-
-  Series: ["Marvel", "Star Wars", "Icon Series", "Gaming Legends Series"],
-
-  "Character Type": ["Superhero", "Agent", "Pilot", "Animal", "Goat", "Peely"],
-
-  Region: ["Asian", "Middle Eastern"],
 };
-
 // =========================
 // CREATE TAG CATEGORIES
 // =========================
