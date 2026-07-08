@@ -72,6 +72,7 @@ body::after{
 }
 
 
+
 /* ========================= */
 /* FONT */
 /* ========================= */
@@ -87,6 +88,69 @@ body::after{
 /* ========================= */
 /* HEADER */
 /* ========================= */
+
+/* ========================= */
+/* VERSION LABELS */
+/* ========================= */
+
+.VersionWebsite{
+
+    position:absolute;
+
+    top:18px;
+
+    left:20px;
+
+    color:rgba(255,255,255,.65);
+
+    font-family:Arial;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    letter-spacing:.8px;
+
+    text-transform:uppercase;
+
+    text-shadow:
+        0 0 10px rgba(0,0,0,.7);
+
+    z-index:5000;
+
+    user-select:none;
+
+}
+
+.VersionIntro{
+
+    position:absolute;
+
+    top:20px;
+
+    left:24px;
+
+    color:rgba(255,255,255,.75);
+
+    font-family:Arial;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+
+    text-shadow:
+        0 0 12px rgba(0,0,0,.8);
+
+    z-index:100000;
+
+    user-select:none;
+
+}
+
 
 .Header {
 
@@ -129,6 +193,8 @@ body::after{
   color: rgb(180,180,180);
 
   font-family: Arial;
+
+  font-weight: bolder;
 }
 
 .CCLogo {
@@ -464,6 +530,12 @@ body::after{
   font-weight: bolder;
 
   font-family: Arial;
+}
+
+.NoResults {
+  font-family: Fortnite;
+
+  font-size: 20px;
 }
 
 
