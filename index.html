@@ -8,9 +8,142 @@
   </head>
 
   <body>
+
     <!-- ========================= -->
     <!-- HEADER -->
     <!-- ========================= -->
+
+    <!-- ========================= -->
+
+   <!-- ============================================ -->
+<!-- FORTSEARCH INTRO -->
+<!-- ============================================ -->
+
+<div id="StartScreen" class="StartScreen">
+
+    <!-- Animated Background -->
+
+    <div class="IntroBackground">
+
+        <div class="GradientOverlay"></div>
+
+        <div class="ParticleContainer" id="ParticleContainer"></div>
+
+        <div class="Vignette"></div>
+
+    </div>
+
+    <!-- Intro Content -->
+
+    <div class="StartContent">
+
+        <!-- Creative Corp Splash -->
+
+        <div id="CreativeCorpSplash" class="CreativeCorpSplash">
+
+            <img
+                src="Images/Creative Corp Logo 2026.png"
+                class="StartLogo"
+            >
+
+            <h2 class="PoweredText">
+                Powered by Creative Corp
+            </h2>
+
+        </div>
+
+        <!-- Main Intro -->
+
+        <div id="FortSearchIntro" class="FortSearchIntro">
+
+            <h1 class="IntroTitle">
+                FortSearch
+            </h1>
+
+            <p class="IntroSubtitle">
+                Search Every Fortnite Skin
+            </p>
+
+            <p class="IntroDescription">
+
+                Search thousands of Fortnite cosmetics using
+                intelligent tags, visual features, clothing,
+                accessories, themes, and more.
+
+            </p>
+
+            <!-- Loading Panel -->
+
+            <div
+                id="LoadingPanel"
+                class="LoadingPanel"
+                style="display:none;"
+            >
+
+                <div
+                    id="LoadingMessage"
+                    class="LoadingMessage"
+                >
+
+                    Connecting...
+
+                </div>
+
+                <div class="LoadingBar">
+
+                    <div
+                        id="LoadingFill"
+                        class="LoadingFill"
+                    ></div>
+
+                </div>
+
+                <div
+                    id="LoadingPercent"
+                    class="LoadingPercent"
+                >
+
+                    0%
+
+                </div>
+
+            </div>
+
+            <!-- Enter Button -->
+
+            <button
+                id="EnterButton"
+                class="EnterButton"
+            >
+
+                ► ENTER FORTSEARCH ◄
+
+            </button>
+
+            <p class="EnterHint">
+
+                Press ENTER or Click
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- MUSIC -->
+<!-- ============================================ -->
+
+<audio id="BackgroundMusic" loop>
+
+    <source
+        src="Music/Fortnite Theme.wav"
+        type="audio/wav"
+    >
+
+</audio>
 
     <div class="Header">
       <div class="PageTitle">
@@ -23,6 +156,8 @@
         <p>By Creative Corp</p>
       </div>
     </div>
+
+    <button id="MusicButton">🔊</button>
 
     <!-- ========================= -->
     <!-- TOP SECTION -->

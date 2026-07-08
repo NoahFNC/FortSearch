@@ -22,35 +22,55 @@ let activeTags = [];
 // TAG CATEGORIES
 // =========================
 
-const tagCategories = {
 
+
+const tagCategories = {
   Accessories: [
+    "Armband",
+    "Ammo Pouch",
+    "Bow Tie",
     "Bracelet",
-    "Earrings",
-    "Glasses",
-    "Goggles",
+    "Bullet Belt",
+    "Chain",
+    "Choker",
+    "Claws",
+    "Harness",
+    "Holster",
     "Necklace",
     "Nails",
-    "Nose Ring",
-    "Piercings",
+    "Pouches",
+    "Sash",
+    "Shoulder Bag",
     "Ring",
     "Scarf",
-    "Visor Glasses",
-    "Watch"
+    "Watch",
   ],
 
-  Age: [
-    "Middle Aged",
-    "Old",
-    "Young"
+
+
+  Facewear: [
+  "Eyepatch",
+  "Face Mask",
+  "Gas Mask",
+  "Glasses",
+  "Goggles",
+  "Respirator",
+  "Visor",
+  "Visor Glasses"
+],
+
+  Piercings: [
+    "Nose Ring",
+    "Plug[Earrings]",
+    "Hoop[Earrings]",
+    "Drop[Earrings]"
+
   ],
 
-  "Art Style": [
-    "Anime",
-    "Cartoon",
-    "Cell shaded"
-  ],
-  "Armor": [
+  Age: ["Middle Aged", "Old", "Young"],
+
+  "Art Style": ["Anime", "Cartoon", "Cell shaded"],
+  Armor: [
     "Arm Bracers",
     "Armored Vest",
     "Chestplate",
@@ -61,54 +81,61 @@ const tagCategories = {
     "Elbow Pads",
   ],
 
-  Belt: [
-    "Military Belt",
-    "Tactical Belt",
-    "Obi"
-  ],
+  Belt: ["Military Belt", "Tactical Belt", "Obi"],
 
-  Body: [
+  Species: [
     "Alien",
     "Animal",
-    "Brute",
-    "Cybernetic",
-    "Cyborg",
-    "Heavy Muscular",
-    "Muscular",
+    "Human",
     "Robot",
-    "Slim",
-    "Spry Muscular"
-  ],
+    "Cyborg",
+    "Cybernetic",
+    "Undead",
+    "Unique",
+],
 
-  "Character Type": [
+ "Body Type": [
+  "Slim",
+  "Slim Muscular",
+  "Average",
+  "Muscular",
+  "Heavy Muscular",
+  "Large",
+  "Brute",
+],
+
+  "Character Archetype": [
     "Agent",
-    "Animal",
+    "Assassin",
+    "Hunter",
+    "Knight",
+    "Mercenary",
     "Ninja",
     "Peely",
     "Pilot",
     "Samurai",
+    "Scientist",
+    "Soldier",
     "Superhero",
-    "Soldier"
-  ],
+    "Villain",
+],
 
-  "Facial Hair": [
-    "Beard",
-    "Goatee",
-    "Mustache"
-  ],
+  "Facial Hair": ["Beard", "Goatee", "Mustache", "None"],
 
-  "Fashion/Outfit": [
+  "Outfit Style": [
     "Armor",
+    "Athletic",
     "Casual",
+    "Formal",
     "Luxury",
     "Medieval",
     "Poor",
     "Spandex",
     "Streetwear",
     "Suit",
-  ],
+],
 
-  "Footwear": [
+  Footwear: [
     "Armored Boots",
     "Barefoot",
     "Casual Shoes",
@@ -118,29 +145,24 @@ const tagCategories = {
     "High Heels",
     "Military Boots",
     "Sandals",
-    "Socks"
+    "Socks",
   ],
 
-  Gender: [
-    "Female",
-    "Male",
-    "Unisex"
+  Sex: ["Female", "Male", "Unisex"],
+
+  Gloves: [
+    "Armored Gloves",
+    "Boxing Gloves",
+    "Clawed Gloves",
+    "Clean Gloves",
+    "Fingerless Gloves",
+    "Leather Gloves",
+    "Mechanical Gloves",
+    "Gloveless",
+    "Rubber Gloves",
+    "Tactical Gloves",
+    "Winter Gloves",
   ],
-
-  "Gloves": [
-  "Armored Gloves",
-  "Boxing Gloves",
-  "Clawed Gloves",
-  "Clean Gloves",
-  "Fingerless Gloves",
-  "Leather Gloves",
-  "Mechanical Gloves",
-  "Gloveless",
-  "Rubber Gloves",
-  "Tactical Gloves",
-  "Winter Gloves",
-],
-
 
   Hair: [
     "Afro",
@@ -148,6 +170,7 @@ const tagCategories = {
     "Bangs",
     "Braids",
     "Buzz Cut",
+    "Cornrows",
     "Curly Hair",
     "Dreads",
     "Fade",
@@ -161,45 +184,49 @@ const tagCategories = {
     "Spiky Hair",
     "Straight Hair",
     "Unique Hairstyle",
-    "Wavy Hair"
+    "Wavy Hair",
   ],
 
-  "Headwear": [
-    "Bandanna",
+  Headwear: [
+    "Bandana",
+    "Beanie",
+    "Beret",
+    "Cap",
+    "Cowboy Hat",
+    "Crown",
     "Durag",
-    "Eyepatch",
-    "Gas Mask",
-    "Glasses",
-    "Goggles",
+    "Glasses[Off]",
+    "Goggles[Off]",
+    "Halo",
     "Hat",
     "Headphones",
+    "Headband",
     "Helmet",
     "Hood",
     "Mask",
-    "Visor",
-    "Visor Glasses"
+    "Tiara",
+    "Visor[Off]",
+    "Visor Glasses[Off]",
   ],
 
-  "Legwear": [
+  Legwear: [
     "Booty Shorts",
     "Cargo Pants",
+    "Cuff Jeans",
     "Formal Pants",
     "Jeans",
-    "Knee Pads",
+    "Joggers",
     "Pajamas",
     "Short Jeans",
     "Shorts",
     "Skirts",
+    "Short Skirts",
+    "Long Skirts",
     "Sweat Pants",
-    "Underwear"
+    "Underwear",
   ],
 
-  Region: [
-    "African",
-    "Asian",
-    "Middle Eastern",
-    "Norwegian"
-  ],
+  Region: ["African", "Asian", "Middle Eastern", "Norwegian", "European"],
 
   Series: [
     "Anime",
@@ -208,13 +235,15 @@ const tagCategories = {
     "Icon Series",
     "Marvel",
     "Star Wars",
-    "TMNT"
+    "TMNT",
   ],
 
   "Skin Tone": [
-    "Dark Skin",
-    "Light Skin",
-    "White"
+    "Light 🧑🏻‍🦲",
+    "Medium Light 🧑🏼‍🦲",
+    "Medium 🧑🏽‍🦲",
+    "Medium Dark 🧑🏾‍🦲",
+    "Dark 🧑🏿‍🦲",
   ],
 
   Themes: [
@@ -223,34 +252,56 @@ const tagCategories = {
     "Fantasy",
     "Futuristic",
     "Horror",
+    "Medieval",
     "Military",
-    "Normal",
+    "Modern",
+    "Post-Apocalyptic",
     "Royalty",
     "School",
     "Space",
+    "Steampunk",
     "Tactical",
-    "Medieval"
-  ],
+],
 
-  "Tops": [
+  Tops: [
     "Blazer",
+    "Corset",
     "Crop Top",
+    "Cropped Jacket",
+    "Dress Shirt",
     "Hoodie",
     "Jacket",
+    "Long Sleeve",
+    "Puffy Jacket",
+    "Scrunch Sleeve Jacket",
     "Shirtless",
+    "Short Sleeve",
+    "Sleeveless",
+    "Sleeveless Jacket",
+    "Sleeveless Dress Shirt",
     "Suspenders",
     "Sweater",
     "Tank Top",
     "Tracksuit Jacket",
-    "T-Shirt"
+    "T-Shirt",
+    "Turtleneck",
+    "U-Neck",
+    "V-Neck",
   ],
 
-  "Weapons": [
-    "Knife",
+  Weapons: [
+    "Bow",
     "Firearm",
-    "Grenades"
-  ]
-
+    "Grenades",
+    "Hammer",
+    "Katana",
+    "Knife",
+    "Pickaxe",
+    "Pistol",
+    "Rifle",
+    "Shotgun",
+    "Sword",
+  ],
 };
 // =========================
 // CREATE TAG CATEGORIES
@@ -449,3 +500,56 @@ skinOverlay.addEventListener("click", (event) => {
 // =========================
 
 displaySkins(skins);
+
+
+const enterButton = document.getElementById("EnterButton");
+const startScreen = document.getElementById("StartScreen");
+const music = document.getElementById("BackgroundMusic");
+
+function enterWebsite() {
+
+    music.volume = 0.35;
+
+    music.play();
+
+    startScreen.classList.add("Hidden");
+
+    setTimeout(() => {
+
+        startScreen.style.display = "none";
+
+    }, 800);
+
+}
+
+enterButton.addEventListener("click", enterWebsite);
+
+document.addEventListener("keydown", (e) => {
+
+    if (e.key === "Enter" && startScreen.style.display !== "none") {
+
+        enterWebsite();
+
+    }
+
+});
+
+const musicButton = document.getElementById("MusicButton");
+
+musicButton.addEventListener("click", () => {
+
+    if (music.paused){
+
+        music.play();
+
+        musicButton.textContent = "🔊";
+
+    } else {
+
+        music.pause();
+
+        musicButton.textContent = "🔇";
+
+    }
+
+});

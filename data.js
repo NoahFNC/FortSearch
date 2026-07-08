@@ -12,18 +12,18 @@ const skins = [
     },
 
     Tags: [
-      "Middle Aged",
+      "Young",
       "Spry Muscular",
+      "None",
       "Casual",
       "Casual Shoes",
       "Male",
       "Gloveless",
       "Fade",
       "Sweat Pants",
-      "Light Skin",
+      "Medium 🧑🏽‍🦲",
       "Normal",
       "Tracksuit Jacket",
-      "Young",
     ],
 
     SearchableTerms: [],
@@ -48,7 +48,6 @@ const skins = [
       "Male",
       "Tactical Gloves",
       "Helmet",
-      "Tactical",
     ],
 
     SearchableTerms: ["tactical armour"],
@@ -134,7 +133,7 @@ const skins = [
       "Space",
     ],
 
-    SearchableTerms: ["armour"],
+    SearchableTerms: [""],
   },
 
   {
@@ -145,9 +144,9 @@ const skins = [
       rarity: "Icon Series",
     },
 
-    Tags: ["Cartoon", "Casual", "Spiky Hair"],
+    Tags: ["Necklace", "Cartoon", "Slim", "Casual", "Casual Shoes", "Male", "Gloveless",  "Spiky Hair",  "Messy Hair",  "Cuff Jeans", "White Skin",  "Sleeveless Dress Shirt",],
 
-    SearchableTerms: ["Spiky Hair"],
+    SearchableTerms: ["band gorillaz"],
   },
 
   {
@@ -158,9 +157,30 @@ const skins = [
       rarity: "Star Wars",
     },
 
-    Tags: ["Star Wars", "Futuristic"],
+    Tags: [
+        "Knee Pads",
+        "Shin Guards",
+        "Shoulder Pads",
+        "Elbow Pads",
+        "Arm Bracers",
+        "Cuisses(Thigh Armor)",
+        "Chestplate",
+        "Military Belt",
+        "Muscular",
+        "Soldier",
+        "Armor",
+        "Casual Shoes",
+        "Male",
+        "Armored Gloves",
+        "Helmet",
+        "Underwear",
+        "Star Wars",
+        "Apocalyptic",
+        "Futuristic",
+        "Space",
+    ],
 
-    SearchableTerms: ["armour"],
+    SearchableTerms: [""],
   },
 
   {
@@ -171,9 +191,9 @@ const skins = [
       rarity: "Epic",
     },
 
-    Tags: ["Tactical", "Number", "Futuristic", "Agent", "Male"],
+    Tags: [],
 
-    SearchableTerms: ["tactical armour"],
+    SearchableTerms: [],
   },
 
   {
@@ -296,7 +316,7 @@ const skins = [
       "graffiti",
       "Hood",
       "Gas mask",
-      "Hat",
+      "Cap",
       "Male",
     ],
 
