@@ -234,11 +234,11 @@ const tagCategories = {
   ],
 
   "Skin Tone": [
-    "Light 🧑🏻‍🦲",
-    "Medium Light 🧑🏼‍🦲",
-    "Medium 🧑🏽‍🦲",
-    "Medium Dark 🧑🏾‍🦲",
-    "Dark 🧑🏿‍🦲",
+    "Light 👍🏻👊🏻",
+    "Medium Light 👍🏼👊🏼",
+    "Medium 👍🏽👊🏽",
+    "Medium Dark 👍🏾👊🏾",
+    "Dark 👍🏿👊🏿",
   ],
 
   Themes: [

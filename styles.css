@@ -111,7 +111,6 @@ body::after{
 
     letter-spacing:.8px;
 
-    text-transform:uppercase;
 
     text-shadow:
         0 0 10px rgba(0,0,0,.7);
@@ -140,7 +139,6 @@ body::after{
 
     letter-spacing:1px;
 
-    text-transform:uppercase;
 
     text-shadow:
         0 0 12px rgba(0,0,0,.8);
