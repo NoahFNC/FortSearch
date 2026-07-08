@@ -449,6 +449,96 @@ body::after{
   gap: 25px;
 }
 
+/* ========================= */
+/* HUB HEADER */
+/* ========================= */
+
+.HubHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.TagToggle{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    font-family:Arial;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    user-select:none;
+
+}
+
+.TagToggle input{
+
+    display:none;
+
+}
+
+.Slider{
+
+    width:56px;
+
+    height:30px;
+
+    background:#444;
+
+    border-radius:999px;
+
+    position:relative;
+
+    transition:.25s;
+
+}
+
+.Slider::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:24px;
+
+    height:24px;
+
+    left:3px;
+
+    top:3px;
+
+    border-radius:50%;
+
+    background:white;
+
+    transition:.25s;
+
+}
+
+.TagToggle input:checked + .Slider{
+
+    background:#4f8fff;
+
+}
+
+.TagToggle input:checked + .Slider::before{
+
+    transform:translateX(26px);
+
+}
+
 
 /* ========================= */
 /* SKIN CARD */

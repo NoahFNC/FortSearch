@@ -2,6 +2,10 @@
 // VARIABLES
 // =========================
 
+let showTags = false;
+
+const tagToggle = document.getElementById("TagToggle");
+
 const skinHub = document.getElementById("SkinHub");
 
 const searchBar = document.getElementById("SearchBar");
@@ -17,6 +21,14 @@ const skinVideo = document.getElementById("SkinVideo");
 const closeButton = document.getElementById("CloseButton");
 
 let activeTags = [];
+
+tagToggle.addEventListener("change", () => {
+
+    showTags = tagToggle.checked;
+
+    filterSystem();
+
+});
 
 // =========================
 // TAG CATEGORIES
@@ -401,13 +413,13 @@ function displaySkins(skinArray) {
   skinArray.forEach((skin) => {
     const imageURL = `./Images/Skins/${skin.id}.jpg`;
 
-    const tagHTML = skin.Tags.map((tag) => {
-      return `
-          <span class="CardTag">
+    const tagHTML = showTags
+    ? skin.Tags.map(tag => `
+        <span class="CardTag">
             ${tag}
-          </span>
-        `;
-    }).join("");
+        </span>
+    `).join("")
+    : "";
 
     skinHub.innerHTML += `
 
@@ -422,9 +434,11 @@ function displaySkins(skinArray) {
 
         <img src="${imageURL}" />
 
+        ${showTags ? `
         <div class="CardTags">
-          ${tagHTML}
+            ${tagHTML}
         </div>
+        ` : ""}
 
       </div>
 
