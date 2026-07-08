@@ -1,0 +1,65 @@
+{
+    "Identity": {
+        "skin_name": "",
+        "gender_body_type": "",
+        "cel_shaded": false,
+        "reactive": false,
+        "rarity": "",
+        "set": ""
+    },
+    "Hair": {
+        "style": "",
+        "color": "",
+        "length": "",
+        "accessories": []
+    },
+    "Face": {
+        "mask": "",
+        "glasses": "",
+        "beard": "",
+        "makeup": "",
+        "tattoos": []
+    },
+    "Torso": {
+        "jacket": "",
+        "hoodie": "",
+        "armor": "",
+        "shirt_type": "",
+        "materials": []
+    },
+    "Arms_Hands": {
+        "gloves": "",
+        "sleeves": "",
+        "arm_accessories": []
+    },
+    "Legs": {
+        "pants_type": "",
+        "shorts": "",
+        "armor": ""
+    },
+    "Shoes": {
+        "boots": "",
+        "sneakers": "",
+        "heels": "",
+        "tactical": ""
+    },
+    "Accessories": {
+        "chains": [],
+        "earrings": [],
+        "backpacks": "",
+        "belts": [],
+        "straps": []
+    },
+    "Theme_Tags": {
+        "cyberpunk": false,
+        "anime": false,
+        "military": false,
+        "streetwear": false,
+        "futuristic": false,
+        "medieval": false,
+        "clean": false,
+        "edgy": false,
+        "luxury": false,
+        "post_apocalyptic": false
+    }
+}

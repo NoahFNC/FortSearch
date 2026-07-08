@@ -8,142 +8,80 @@
   </head>
 
   <body>
-
     <!-- ========================= -->
     <!-- HEADER -->
     <!-- ========================= -->
 
     <!-- ========================= -->
 
-   <!-- ============================================ -->
-<!-- FORTSEARCH INTRO -->
-<!-- ============================================ -->
+    <!-- ============================================ -->
+    <!-- FORTSEARCH INTRO -->
+    <!-- ============================================ -->
 
-<div id="StartScreen" class="StartScreen">
+    <div id="StartScreen" class="StartScreen">
+      <!-- Animated Background -->
 
-    <!-- Animated Background -->
-
-    <div class="IntroBackground">
-
+      <div class="IntroBackground">
         <div class="GradientOverlay"></div>
 
         <div class="ParticleContainer" id="ParticleContainer"></div>
 
         <div class="Vignette"></div>
+      </div>
 
-    </div>
+      <!-- Intro Content -->
 
-    <!-- Intro Content -->
-
-    <div class="StartContent">
-
+      <div class="StartContent">
         <!-- Creative Corp Splash -->
 
         <div id="CreativeCorpSplash" class="CreativeCorpSplash">
+          <img src="Images/Creative Corp Logo 2026.png" class="StartLogo" />
 
-            <img
-                src="Images/Creative Corp Logo 2026.png"
-                class="StartLogo"
-            >
-
-            <h2 class="PoweredText">
-                Powered by Creative Corp
-            </h2>
-
+          <h2 class="PoweredText">Powered by Creative Corp</h2>
         </div>
 
         <!-- Main Intro -->
 
         <div id="FortSearchIntro" class="FortSearchIntro">
+          <h1 class="IntroTitle">FortSearch</h1>
 
-            <h1 class="IntroTitle">
-                FortSearch
-            </h1>
+          <p class="IntroSubtitle">Search Every Fortnite Skin</p>
 
-            <p class="IntroSubtitle">
-                Search Every Fortnite Skin
-            </p>
+          <p class="IntroDescription">
+            Search thousands of Fortnite cosmetics using intelligent tags,
+            visual features, clothing, accessories, themes, and more.
+          </p>
 
-            <p class="IntroDescription">
+          <!-- Loading Panel -->
 
-                Search thousands of Fortnite cosmetics using
-                intelligent tags, visual features, clothing,
-                accessories, themes, and more.
+          <div id="LoadingPanel" class="LoadingPanel" style="display: none">
+            <div id="LoadingMessage" class="LoadingMessage">Connecting...</div>
 
-            </p>
-
-            <!-- Loading Panel -->
-
-            <div
-                id="LoadingPanel"
-                class="LoadingPanel"
-                style="display:none;"
-            >
-
-                <div
-                    id="LoadingMessage"
-                    class="LoadingMessage"
-                >
-
-                    Connecting...
-
-                </div>
-
-                <div class="LoadingBar">
-
-                    <div
-                        id="LoadingFill"
-                        class="LoadingFill"
-                    ></div>
-
-                </div>
-
-                <div
-                    id="LoadingPercent"
-                    class="LoadingPercent"
-                >
-
-                    0%
-
-                </div>
-
+            <div class="LoadingBar">
+              <div id="LoadingFill" class="LoadingFill"></div>
             </div>
 
-            <!-- Enter Button -->
+            <div id="LoadingPercent" class="LoadingPercent">0%</div>
+          </div>
 
-            <button
-                id="EnterButton"
-                class="EnterButton"
-            >
+          <!-- Enter Button -->
 
-                ► ENTER FORTSEARCH ◄
+          <button id="EnterButton" class="EnterButton">
+            ► ENTER FORTSEARCH ◄
+          </button>
 
-            </button>
-
-            <p class="EnterHint">
-
-                Press ENTER or Click
-
-            </p>
-
+          <p class="EnterHint">Press ENTER or Click</p>
         </div>
-
+      </div>
     </div>
 
-</div>
+    <!-- ============================================ -->
+    <!-- MUSIC -->
+    <!-- ============================================ -->
 
-<!-- ============================================ -->
-<!-- MUSIC -->
-<!-- ============================================ -->
-
-<audio id="BackgroundMusic" loop>
-
-    <source
-        src="Music/Fortnite Theme.wav"
-        type="audio/wav"
-    >
-
-</audio>
+    <audio id="BackgroundMusic" loop>
+      <source src="Music/Fortnite Theme.wav" type="audio/wav" />
+    </audio>
 
     <div class="Header">
       <div class="PageTitle">

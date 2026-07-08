@@ -22,8 +22,6 @@ let activeTags = [];
 // TAG CATEGORIES
 // =========================
 
-
-
 const tagCategories = {
   Accessories: [
     "Armband",
@@ -46,25 +44,22 @@ const tagCategories = {
     "Watch",
   ],
 
-
-
   Facewear: [
-  "Eyepatch",
-  "Face Mask",
-  "Gas Mask",
-  "Glasses",
-  "Goggles",
-  "Respirator",
-  "Visor",
-  "Visor Glasses"
-],
+    "Eyepatch",
+    "Face Mask",
+    "Gas Mask",
+    "Glasses",
+    "Goggles",
+    "Respirator",
+    "Visor",
+    "Visor Glasses",
+  ],
 
   Piercings: [
     "Nose Ring",
     "Plug[Earrings]",
     "Hoop[Earrings]",
-    "Drop[Earrings]"
-
+    "Drop[Earrings]",
   ],
 
   Age: ["Middle Aged", "Old", "Young"],
@@ -92,17 +87,17 @@ const tagCategories = {
     "Cybernetic",
     "Undead",
     "Unique",
-],
+  ],
 
- "Body Type": [
-  "Slim",
-  "Slim Muscular",
-  "Average",
-  "Muscular",
-  "Heavy Muscular",
-  "Large",
-  "Brute",
-],
+  "Body Type": [
+    "Slim",
+    "Slim Muscular",
+    "Average",
+    "Muscular",
+    "Heavy Muscular",
+    "Large",
+    "Brute",
+  ],
 
   "Character Archetype": [
     "Agent",
@@ -118,7 +113,7 @@ const tagCategories = {
     "Soldier",
     "Superhero",
     "Villain",
-],
+  ],
 
   "Facial Hair": ["Beard", "Goatee", "Mustache", "None"],
 
@@ -133,7 +128,7 @@ const tagCategories = {
     "Spandex",
     "Streetwear",
     "Suit",
-],
+  ],
 
   Footwear: [
     "Armored Boots",
@@ -261,7 +256,7 @@ const tagCategories = {
     "Space",
     "Steampunk",
     "Tactical",
-],
+  ],
 
   Tops: [
     "Blazer",
@@ -501,55 +496,40 @@ skinOverlay.addEventListener("click", (event) => {
 
 displaySkins(skins);
 
-
 const enterButton = document.getElementById("EnterButton");
 const startScreen = document.getElementById("StartScreen");
 const music = document.getElementById("BackgroundMusic");
 
 function enterWebsite() {
+  music.volume = 0.35;
 
-    music.volume = 0.35;
+  music.play();
 
-    music.play();
+  startScreen.classList.add("Hidden");
 
-    startScreen.classList.add("Hidden");
-
-    setTimeout(() => {
-
-        startScreen.style.display = "none";
-
-    }, 800);
-
+  setTimeout(() => {
+    startScreen.style.display = "none";
+  }, 800);
 }
 
 enterButton.addEventListener("click", enterWebsite);
 
 document.addEventListener("keydown", (e) => {
-
-    if (e.key === "Enter" && startScreen.style.display !== "none") {
-
-        enterWebsite();
-
-    }
-
+  if (e.key === "Enter" && startScreen.style.display !== "none") {
+    enterWebsite();
+  }
 });
 
 const musicButton = document.getElementById("MusicButton");
 
 musicButton.addEventListener("click", () => {
+  if (music.paused) {
+    music.play();
 
-    if (music.paused){
+    musicButton.textContent = "🔊";
+  } else {
+    music.pause();
 
-        music.play();
-
-        musicButton.textContent = "🔊";
-
-    } else {
-
-        music.pause();
-
-        musicButton.textContent = "🔇";
-
-    }
-
+    musicButton.textContent = "🔇";
+  }
 });
