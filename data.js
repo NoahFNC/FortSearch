@@ -75,7 +75,7 @@ const skins = [
 
     isEditStyle: true,
     
-    icon: "https://static.wikia.nocookie.net/fortnite/images/9/9f/1-Ball_%28Jacket_-_On%29_-_Outfit_-_Fortnite.png/revision/latest?cb=20241102100317",
+    icon: "Images/Skins/1-Ball_29_-_Outfit_-_Fortnite.png",
     video: "https://fnggcdn.com/items/15288/video-1-2-1.mp4?2",
 
     Identity: {
