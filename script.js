@@ -74,13 +74,14 @@ const tagCategories = {
     "Drop[Earrings]",
   ],
 
-  Age: ["Middle Aged", "Old", "Young"],
+  Age: ["Middle Aged", "Old", "Young",],
 
-  "Art Style": ["Anime", "Cartoon", "Cell shaded"],
+  "Art Style": ["Anime", "Cartoon", "Cell shaded", "Non Cell Shaded",],
+  
   Armor: [
     "Arm Bracers",
     "Armored Vest",
-    "Chestplate",
+    "Chest plate",
     "Cuisses(Thigh Armor)",
     "Knee Pads",
     "Shin Guards",
@@ -88,7 +89,7 @@ const tagCategories = {
     "Elbow Pads",
   ],
 
-  Belt: ["Military Belt", "Tactical Belt", "Obi"],
+  Belt: ["Military Belt", "Tactical Belt", "Obi",],
 
   Species: [
     "Alien",
@@ -112,8 +113,8 @@ const tagCategories = {
   ],
 
   "Character Archetype": [
-    "Agent",
     "Assassin",
+    "Civilian",
     "Hunter",
     "Knight",
     "Mercenary",
@@ -127,10 +128,21 @@ const tagCategories = {
     "Villain",
   ],
 
-  "Facial Hair": ["Beard", "Goatee", "Mustache", "None"],
+  "Facial Hair": ["Beard", "Goatee", "Mustache", "Clean-Shaven",],
+
+  "Full-Body Garments": [
+    "Jumpsuit",
+    "Romper",
+    "Unitard",
+    "Leotard",
+    "Morph Suit",
+    "Wet Suit",
+    "Hazmat Suit",
+    "Flight Suit",
+  ],
 
   "Outfit Style": [
-    "Armor",
+    "Armored",
     "Athletic",
     "Casual",
     "Formal",
@@ -152,7 +164,9 @@ const tagCategories = {
     "High Heels",
     "Military Boots",
     "Sandals",
+    "Sneakers",
     "Socks",
+    "Strapped Boots"
   ],
 
   Sex: ["Female", "Male", "Unisex"],
@@ -217,9 +231,10 @@ const tagCategories = {
   ],
 
   Legwear: [
+    "Bell Bottoms",
     "Booty Shorts",
     "Cargo Pants",
-    "Cuff Jeans",
+    "Cuffed Pants",
     "Formal Pants",
     "Jeans",
     "Joggers",
@@ -228,12 +243,14 @@ const tagCategories = {
     "Shorts",
     "Skirts",
     "Short Skirts",
+    "Skin Tight Pants",
     "Long Skirts",
     "Sweat Pants",
+    "Track Pants",
     "Underwear",
   ],
 
-  Region: ["African", "Asian", "Middle Eastern", "Norwegian", "European"],
+  Region: ["African", "Asian", "Middle Eastern", "Norwegian", "European", "South American"],
 
   Series: [
     "Anime",
@@ -283,6 +300,7 @@ const tagCategories = {
     "Scrunch Sleeve Jacket",
     "Shirtless",
     "Short Sleeve",
+    "Skin Tight Chest",
     "Sleeveless",
     "Sleeveless Jacket",
     "Sleeveless Dress Shirt",
@@ -291,6 +309,7 @@ const tagCategories = {
     "Tank Top",
     "Tracksuit Jacket",
     "T-Shirt",
+    "Toga",
     "Turtleneck",
     "U-Neck",
     "V-Neck",
@@ -386,7 +405,9 @@ function openSkinOverlay(skin) {
 
   overlaySkinName.textContent = skin.Identity.skin_name;
 
-  const videoURL = `https://fnggcdn.com/items/${skin.id}/video.mp4?2`;
+  const videoURL =
+    skin.video ??
+    `https://fnggcdn.com/items/${skin.id}/video.mp4?2`;
 
   skinVideo.src = videoURL;
 
@@ -411,7 +432,9 @@ function displaySkins(skinArray) {
   }
 
   skinArray.forEach((skin) => {
-    const imageURL = `./Images/Skins/${skin.id}.jpg`;
+    const imageURL = skin.isEditStyle
+    ? skin.icon
+    : `./Images/Skins/${skin.id}.jpg`;
 
     const tagHTML = showTags
     ? skin.Tags.map(tag => `

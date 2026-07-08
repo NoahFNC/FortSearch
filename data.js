@@ -6,23 +6,30 @@ const skins = [
   {
     id: "8086",
 
+    isEditStyle: false,
+    icon: undefined,
+    video: undefined,
+
     Identity: {
       skin_name: "'Mato Marauder",
-      rarity: "Rare",
     },
 
     Tags: [
       "Young",
-      "Spry Muscular",
-      "None",
-      "Casual",
-      "Casual Shoes",
+      "Non Cell Shaded",
+      "Human",
+      "Average",
+      "Civilian",
+      "Clean-Shaven",
+      "Athletic",
+      "Sneakers",
       "Male",
       "Gloveless",
       "Fade",
-      "Sweat Pants",
-      "Medium 🧑🏽‍🦲",
-      "Normal",
+      "Track Pants",
+      "Cuffed Pants",
+      "Medium 👍🏽👊🏽",
+      "Modern",
       "Tracksuit Jacket",
     ],
 
@@ -32,25 +39,67 @@ const skins = [
   {
     id: "15288",
 
+    isEditStyle: false,
+    icon: undefined,
+    video: undefined,
+
     Identity: {
       skin_name: "1-Ball",
-      rarity: "Epic",
     },
 
     Tags: [
+      "Young",
+      "Non Cell Shaded",
+      "Arm Bracers",
+      "Chest plate",
       "Knee Pads",
       "Shoulder Pads",
-      "Chestplate",
-      "Tactical",
-      "Spry Muscular",
-      "Armor",
-      "Clean Boots",
+      "Human",
+      "Average",
+      "Ninja",
+      "Unitard",
+      "Armored",
+      "Strapped Boots",
       "Male",
+      "Armored Gloves",
       "Tactical Gloves",
       "Helmet",
+      "Tactical",
     ],
 
-    SearchableTerms: ["tactical armour"],
+    SearchableTerms: [],
+  },
+
+  {
+    id: "15288",
+
+    isEditStyle: true,
+    
+    icon: "https://static.wikia.nocookie.net/fortnite/images/9/9f/1-Ball_%28Jacket_-_On%29_-_Outfit_-_Fortnite.png/revision/latest?cb=20241102100317",
+    video: "https://fnggcdn.com/items/15288/video-1-2-1.mp4?2",
+
+    Identity: {
+      skin_name: "1-Ball[Jacket]",
+    },
+
+    Tags: [
+      "Young",
+      "Non Cell Shaded",
+      "Knee Pads",
+      "Human",
+      "Average",
+      "Ninja",
+      "Unitard",
+      "Strapped Boots",
+      "Male",
+      "Armored Gloves",
+      "Tactical Gloves",
+      "Helmet",
+      "Tactical",
+      "Puffy Jacket",
+    ],
+
+    SearchableTerms: [],
   },
 
   {
@@ -284,7 +333,7 @@ const skins = [
       rarity: "Epic",
     },
 
-    Tags: ["Young Male", "Cartoon", "Asian"],
+    Tags: ["Young Male", "Cartoon", "Asian", "Toga"],
 
     SearchableTerms: ["Toga", "Monk", "Bald"],
   },
