@@ -894,7 +894,7 @@ body::after{
     0px 0px 40px rgba(255,255,255,0.1);
 }
 
-.OverlaySkinName {
+#OverlaySkinName {
 
   color: white;
 
@@ -907,9 +907,10 @@ body::after{
   margin-bottom: 20px;
 
   padding-right: 50px;
+
 }
 
-.SkinVideo {
+#SkinVideo {
 
   width: 100%;
 
@@ -917,42 +918,13 @@ body::after{
 
   border-radius: 20px;
 
-  background-color: black;
+  background: black;
 
   object-fit: contain;
+
 }
 
-.CloseButton {
 
-  position: absolute;
-
-  top: 18px;
-  right: 18px;
-
-  width: 42px;
-  height: 42px;
-
-  border: none;
-
-  border-radius: 50%;
-
-  background-color: rgb(35,35,35);
-
-  color: white;
-
-  font-size: 20px;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
-}
-
-.CloseButton:hover {
-
-  background-color: rgb(60,60,60);
-
-  transform: scale(1.08);
-}
 
 /* ========================= */
 /* TAG CATEGORIES */
@@ -1417,5 +1389,135 @@ opacity:.2;
   font-family: Arial;
 
   font-weight: bolder;
+
+}
+
+.Warning {
+  color: #ffb347;
+  font-weight: bold;
+}
+
+.OverlayContent {
+
+  display: flex;
+
+  position: relative;
+
+  gap: 40px;
+
+  align-items: flex-start;
+
+}
+
+.OverlayVideo {
+
+  flex: 1;
+
+}
+
+.OverlayInfo {
+
+  width: 350px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  font-weight: bolder;
+
+  font-family: Arial;
+
+  gap: 12px;
+
+}
+
+.InfoRow {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  margin-bottom: 18px;
+
+}
+
+.InfoLabel {
+
+  font-family: Fortnite;
+
+  font-size: 35px;
+
+  color: #ffffff;
+
+}
+
+.InfoValue {
+
+  font-family: Arial;
+
+  font-size: 16px;
+
+  font-weight: bolder;
+
+  color: white;
+
+  overflow-wrap: anywhere;
+
+  word-break: break-word;
+
+}
+
+
+#OverlayTags {
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+}
+
+.CloseButton {
+
+  position: absolute;
+
+  top: 20px;
+  right: 20px;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  font-size: 24px;
+
+  background: #222;
+  color: white;
+
+  transition: .2s;
+
+}
+
+.CloseButton:hover {
+
+  transform: scale(1.1);
+
+  background: #444;
+
+}
+
+.OverlayTag {
+
+  background: #3d5afe;
+
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  font-size: 14px;
 
 }

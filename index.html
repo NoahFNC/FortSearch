@@ -191,6 +191,8 @@
                   class="AISearchResults"
               >
                   Searches skin names only.
+
+
               </div>
 
           </div>
@@ -252,11 +254,54 @@
 
     <div class="SkinOverlay" id="SkinOverlay">
       <div class="OverlayContent">
-        <button class="CloseButton" id="CloseButton">✕</button>
 
-        <h2 class="OverlaySkinName" id="OverlaySkinName">Skin Name</h2>
+        <button id="CloseButton" class="CloseButton">✕</button>
 
-        <video class="SkinVideo" id="SkinVideo" controls autoplay loop></video>
+        <div class="OverlayVideo">
+
+            <video
+                id="SkinVideo"
+                controls
+                autoplay
+                loop
+                muted>
+            </video>
+
+        </div>
+
+        <div class="OverlayInfo">
+
+          <h2 id="OverlaySkinName"></h2>
+
+          <div class="InfoRow">
+              <span class="InfoLabel">Source: </span>
+              <span id="OverlaySource"></span>
+          </div>
+
+          <div class="InfoRow">
+              <span class="InfoLabel">Introduced: </span>
+              <span id="OverlayIntroduced"></span>
+          </div>
+
+          <div class="InfoRow">
+              <span class="InfoLabel">Rarity: </span>
+              <span id="OverlayRarity"></span>
+          </div>
+
+           <div class="InfoRow">
+            <span class="InfoLabel">Codename</span>
+            <span id="OverlayCodename" class="InfoValue"></span>
+          </div>
+
+          
+
+         
+
+          <h3>Tags</h3>
+
+          <div id="OverlayTags"></div>
+        </div>
+
       </div>
     </div>
 

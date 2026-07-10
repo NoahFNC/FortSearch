@@ -1,6 +1,15 @@
 // =========================
 // VARIABLES
 // =========================
+const overlaySkinName = document.getElementById("OverlaySkinName");
+const overlaySource = document.getElementById("OverlaySource");
+const overlayIntroduced = document.getElementById("OverlayIntroduced");
+const overlayCodename = document.getElementById("OverlayCodename");
+const overlayRarity = document.getElementById("OverlayRarity");
+const overlayTags = document.getElementById("OverlayTags");
+const skinVideo = document.getElementById("SkinVideo");
+const skinOverlay = document.getElementById("SkinOverlay");
+const closeButton = document.getElementById("CloseButton");
 
 let showTags = false;
 
@@ -30,7 +39,10 @@ aiSearchButton.addEventListener("click", () => {
     aiSearchPanel.querySelector(".AISearchTitle").textContent =
       "AI Search Enabled";
 
-    aiSearchResults.textContent = "Describe a skin using natural language.";
+    aiSearchResults.innerHTML = `Describe a skin using natural language.<br><br>
+    <span class="Warning">
+    ⚠ Warning: Do not use when searching for multiple highly specific pieces. Instead, use the regular tags panel!
+    </span>`;
 
     searchBar.placeholder = "Describe a skin...";
   } else {
@@ -60,17 +72,30 @@ const searchBar = document.getElementById("SearchBar");
 
 const tagList = document.getElementById("TagList");
 
-const skinOverlay = document.getElementById("SkinOverlay");
 
-const overlaySkinName = document.getElementById("OverlaySkinName");
-
-const skinVideo = document.getElementById("SkinVideo");
-
-const closeButton = document.getElementById("CloseButton");
 
 const timelineList = document.getElementById("TimelineList");
 
 let activeTags = [];
+
+closeButton.addEventListener("click", () => {
+  skinOverlay.style.display = "none";
+
+  skinVideo.pause();
+  skinVideo.src = "";
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && skinOverlay.style.display === "flex") {
+    closeSkinOverlay();
+  }
+});
+
+skinOverlay.addEventListener("click", (e) => {
+  if (e.target === skinOverlay) {
+    closeSkinOverlay();
+  }
+});
 
 
 
@@ -155,12 +180,17 @@ const tagCategories = {
 
   Species: [
     "Alien",
+    "Android",
     "Animal",
     "Human",
     "Robot",
     "Cyborg",
     "Cybernetic",
+    "Monster",
     "Undead",
+    "Zombie",
+    "Skeleton",
+    "Ghost",
     "Unique",
   ],
 
@@ -401,35 +431,221 @@ const tagCategories = {
 // =========================
 
 const tagAliases = {
+  // =========================
+  // SEX / AGE
+  // =========================
 
-  // Sex
-  "guy": ["Male"],
-  "guys": ["Male"],
+  guy: ["Male"],
+  guys: ["Male"],
+  man: ["Male"],
+  men: ["Male"],
+  male: ["Male"],
+  boy: ["Male", "Young"],
+  boys: ["Male", "Young"],
+  gentleman: ["Male"],
+  gentlemen: ["Male"],
+  dude: ["Male"],
+  dudes: ["Male"],
 
-  "man": ["Male"],
-  "men": ["Male"],
+  girl: ["Female", "Young"],
+  girls: ["Female", "Young"],
+  female: ["Female"],
+  woman: ["Female"],
+  women: ["Female"],
+  lady: ["Female"],
+  ladies: ["Female"],
 
-  "gentleman": ["Male"],
-  "gentlemen": ["Male"],
+  kid: ["Young"],
+  child: ["Young"],
+  teen: ["Young"],
+  teenager: ["Young"],
 
-  "boy": ["Male", "Young"],
-  "boys": ["Male", "Young"],
+  adult: ["Middle Aged"],
+  elderly: ["Old"],
+  senior: ["Old"],
 
-  "girl": ["Female", "Young"],
-  "girls": ["Female", "Young"],
+  // =========================
+  // SPECIES
+  // =========================
 
-  "woman": ["Female"],
-  "women": ["Female"],
+  person: ["Human"],
+  human: ["Human"],
 
-  "lady": ["Female"],
-  "ladies": ["Female"],
+  robotic: ["Robot"],
+  machine: ["Robot"],
 
-  // Themes
-  "future": ["Futuristic"],
-  "fancy": ["Luxury"],
-  "creepy": ["Horror"],
-  "scary": ["Horror"],
+  beast: ["Animal"],
 
+  extraterrestrial: ["Alien"],
+
+  // =========================
+  // BODY TYPE
+  // =========================
+
+  skinny: ["Slim"],
+  thin: ["Slim"],
+
+  buff: ["Muscular"],
+  ripped: ["Muscular"],
+  strong: ["Muscular"],
+
+  huge: ["Large"],
+  massive: ["Large"],
+  giant: ["Large"],
+  big: ["Large"],
+  bulky: ["Large"],
+
+  // =========================
+  // THEMES
+  // =========================
+
+  future: ["Futuristic"],
+
+  "high tech": ["Futuristic"],
+
+  magic: ["Fantasy"],
+  wizard: ["Fantasy"],
+
+  scary: ["Horror"],
+  creepy: ["Horror"],
+  spooky: ["Horror"],
+
+  combat: ["Military"],
+  war: ["Military"],
+
+  wasteland: ["Post-Apocalyptic"],
+
+  // =========================
+  // OUTFIT STYLE
+  // =========================
+
+  armor: ["Armored"],
+  armour: ["Armored"],
+
+  sporty: ["Athletic"],
+
+  business: ["Formal"],
+
+  dressy: ["Formal"],
+
+  fancy: ["Luxury"],
+  wealthy: ["Luzury"],
+
+  knightly: ["Medieval"],
+
+  homeless: ["Poor"],
+  ragged: ["Poor"],
+
+  latex: ["Spandex"],
+
+  urban: ["Streetwear"],
+
+  "business suit": ["Suit"],
+
+  // =========================
+  // CHARACTER TYPES
+  // =========================
+
+  killer: ["Assassin"],
+  hitman: ["Assassin"],
+
+  citizen: ["Civilian"],
+
+  tracker: ["Hunter"],
+
+  "bounty hunter": ["Mercenary"],
+
+  shinobi: ["Ninja"],
+
+  banana: ["Peely"],
+
+  aviator: ["Pilot"],
+
+  researcher: ["Scientist"],
+
+  trooper: ["Soldier"],
+  soldier: ["Soldier", "Military"],
+
+  hero: ["Superhero"],
+
+  "bad guy": ["Villain"],
+  evil: ["Villain"],
+
+  // =========================
+  // FACIAL HAIR
+  // =========================
+
+  "clean shave": ["Clean-Shaven"],
+  "clean shaven": ["Clean-Shaven"],
+
+  mustache: ["Mustache"],
+  moustache: ["Mustache"],
+
+  // =========================
+  // HEADWEAR
+  // =========================
+
+  hooded: ["Hood"],
+
+  headset: ["Headphones"],
+
+  mask: ["Mask"],
+  "face covering": ["Mask"],
+
+  // =========================
+  // FACEWEAR
+  // =========================
+  shades: ["Sun Glasses"],
+  // =========================
+  // ACCESSORIES
+  // =========================
+  "bullet strap": ["Bullet Belt"],
+  // =========================
+  // GLOVES
+  // =========================
+  // =========================
+  // FOOTWEAR
+  // =========================
+  "combat boots": ["Military Boots"],
+  "army boots": ["Military Boots"],
+  "tactical boots": ["Military Boots"],
+
+  heels: ["High Heels"],
+
+  "running shoes": ["Sneakers"],
+
+  "bare feet": ["Barefoot"],
+
+  "flip flops": ["Sandals"],
+
+  // =========================
+  // HAIR
+  // =========================
+
+  dreadlocks: ["Dreads"],
+
+  // =========================
+  // SERIES
+  // =========================
+
+  // =========================
+  // SKIN TONE
+  // =========================
+
+  Black: ["Dark 👍🏿👊🏿", "Medium Dark 👍🏾👊🏾"],
+  Brown: ["Medium Dark 👍🏾👊🏾"],
+  White: ["Light 👍🏻👊🏻", "Medium Light 👍🏼👊🏼"],
+  Mixed: ["Medium 👍🏽👊🏽"],
+
+  // =========================
+  // WEAPONS
+  // =========================
+
+  gun: ["Firearm"],
+  guns: ["Firearm"],
+
+  blade: ["Sword"],
+  katana: ["Katana", "Sword"],
 };
 
 // =========================
@@ -834,11 +1050,29 @@ function openSkinOverlay(skin) {
 
   overlaySkinName.textContent = skin.Identity.skin_name;
 
-  const videoURL =
-    skin.video ??
-    `https://fnggcdn.com/items/${skin.id}/video.mp4?2`;
+  overlaySource.textContent = skin.Source || "Unknown";
 
-  skinVideo.src = videoURL;
+  overlayIntroduced.textContent = `Chapter ${skin.Chapter} Season ${skin.Season}`;
+
+  overlayRarity.textContent = skin.Rarity || skin.rarity || "Unknown";
+
+  overlayCodename.textContent = skin.Codename || skin.codename || "Unknown";
+
+
+  overlayTags.innerHTML = "";
+
+  skin.Tags.forEach((tag) => {
+    const div = document.createElement("div");
+
+    div.className = "OverlayTag";
+
+    div.textContent = tag;
+
+    overlayTags.appendChild(div);
+  });
+
+  skinVideo.src =
+    skin.video ?? `https://fnggcdn.com/items/${skin.id}/video.mp4?2`;
 
   skinVideo.play();
 }
@@ -967,13 +1201,6 @@ searchBar.addEventListener("input", () => {
 // CLOSE OVERLAY
 // =========================
 
-closeButton.addEventListener("click", () => {
-  skinOverlay.style.display = "none";
-
-  skinVideo.pause();
-
-  skinVideo.src = "";
-});
 
 skinOverlay.addEventListener("click", (event) => {
   if (event.target === skinOverlay) {
