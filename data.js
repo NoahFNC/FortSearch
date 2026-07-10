@@ -81,6 +81,9 @@ const skins = [
     icon: "Images/Skins/T_Soldier_StageCue_ChalkJacket.png",
     video: "https://fnggcdn.com/items/15288/video-1-2-1.mp4?2",
 
+    Chapter: "Remix",
+    Season: "",
+
     Identity: {
       skin_name: "1-Ball[Jacket]",
     },
