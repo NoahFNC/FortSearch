@@ -231,13 +231,11 @@ body::after{
 
 .TimelinePanel {
 
-  position: absolute;
+  position: relative;
 
   width: 300px;
 
-  left: 1400px;
-
-  top: 230px;
+  
 
   background:
     linear-gradient(180deg,
@@ -493,6 +491,8 @@ body::after{
 #SearchBar {
 
   width: 100%;
+
+  box-sizing: border-box;
 
   padding: 18px 22px;
 
@@ -1255,4 +1255,7 @@ opacity:.2;
 }
 
 }
+
+
+
 
