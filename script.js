@@ -403,26 +403,117 @@ const tagCategories = {
 const tagAliases = {
 
   // Sex
-  "guy": "Male",
-  "boy": "Male",
-  "boy": "Young",
-  "man": "Male",
-  "men": "Male",
-  "male character": "Male",
-  "dude": "Male",
+  "guy": ["Male"],
+  "guys": ["Male"],
 
-  "girl": "Female",
-  "girl": "Young",
-  "woman": "Female",
-  "women": "Female",
-  "female character": "Female",
-  "lady": "Female",
+  "man": ["Male"],
+  "men": ["Male"],
 
-  
-  "future": "Futuristic",
-  "fancy": "Luxury",
+  "gentleman": ["Male"],
+  "gentlemen": ["Male"],
+
+  "boy": ["Male", "Young"],
+  "boys": ["Male", "Young"],
+
+  "girl": ["Female", "Young"],
+  "girls": ["Female", "Young"],
+
+  "woman": ["Female"],
+  "women": ["Female"],
+
+  "lady": ["Female"],
+  "ladies": ["Female"],
+
+  // Themes
+  "future": ["Futuristic"],
+  "fancy": ["Luxury"],
+  "creepy": ["Horror"],
+  "scary": ["Horror"],
 
 };
+
+// =========================
+// FIND TAG
+// =========================
+
+function findTag(word) {
+
+  const lowerWord = word.toLowerCase().trim();
+
+  // -------------------------
+  // Exact Match
+  // -------------------------
+
+  let tag = allTags.find(
+    t => t.toLowerCase() === lowerWord
+  );
+
+  if (tag) return tag;
+
+
+  // -------------------------
+  // Alias Match
+  // -------------------------
+
+  if (tagAliases[lowerWord]) {
+    return tagAliases[lowerWord];
+  }
+
+
+  // -------------------------
+  // Plural: ies → y
+  // -------------------------
+
+  if (lowerWord.endsWith("ies")) {
+
+    tag = allTags.find(
+      t =>
+        t.toLowerCase() ===
+        lowerWord.slice(0, -3) + "y"
+    );
+
+    if (tag) return tag;
+
+  }
+
+
+  // -------------------------
+  // Plural: es
+  // -------------------------
+
+  if (lowerWord.endsWith("es")) {
+
+    tag = allTags.find(
+      t =>
+        t.toLowerCase() ===
+        lowerWord.slice(0, -2)
+    );
+
+    if (tag) return tag;
+
+  }
+
+
+  // -------------------------
+  // Plural: s
+  // -------------------------
+
+  if (lowerWord.endsWith("s")) {
+
+    tag = allTags.find(
+      t =>
+        t.toLowerCase() ===
+        lowerWord.slice(0, -1)
+    );
+
+    if (tag) return tag;
+
+  }
+
+
+  return null;
+
+}
 
 const allTags = Object.values(tagCategories)
   .flat()
@@ -435,14 +526,13 @@ function parseSearchQuery(searchText) {
 
   let processedQuery = query;
 
-  Object.entries(tagAliases).forEach(([alias, tag]) => {
+  Object.entries(tagAliases).forEach(([alias, tags]) => {
     const regex = new RegExp(`\\b${alias}\\b`, "gi");
 
     if (regex.test(processedQuery)) {
-      processedQuery = processedQuery.replace(regex, tag);
+      processedQuery = processedQuery.replace(regex, tags.join(" "));
     }
   });
-
   // =========================
   // NORMAL SEARCH
   // =========================
@@ -470,7 +560,6 @@ function parseSearchQuery(searchText) {
     const regex = new RegExp(`\\b${lowerTag}\\b`, "i");
 
     if (regex.test(remainingText)) {
-
       extractedTags.push(tag);
 
       remainingText = remainingText.replace(regex, " ");
@@ -481,12 +570,33 @@ function parseSearchQuery(searchText) {
 
   const leftoverWords = remainingText.split(/\s+/).filter(Boolean);
 
+  // Check remaining words for singular/plural tags
+
+  for (let i = 0; i < leftoverWords.length; i++) {
+    const detectedTags = findTag(leftoverWords[i]);
+
+    if (detectedTags) {
+      const tags = Array.isArray(detectedTags) ? detectedTags : [detectedTags];
+
+      tags.forEach((tag) => {
+        if (!extractedTags.includes(tag)) {
+          extractedTags.push(tag);
+        }
+      });
+
+      leftoverWords[i] = "";
+    }
+  }
+
   const nameWords = [];
 
+  // Remove words that became tags
+  const remainingWords = leftoverWords.filter(Boolean);
+
   // Check every possible word combination
-  for (let start = 0; start < leftoverWords.length; start++) {
-    for (let end = leftoverWords.length; end > start; end--) {
-      const phrase = leftoverWords.slice(start, end).join(" ");
+  for (let start = 0; start < remainingWords.length; start++) {
+    for (let end = remainingWords.length; end > start; end--) {
+      const phrase = remainingWords.slice(start, end).join(" ");
 
       const possibleSkin = skins.find(
         (skin) => skin.Identity.skin_name.toLowerCase() === phrase,
@@ -497,7 +607,7 @@ function parseSearchQuery(searchText) {
 
         // Remove used words
         for (let i = start; i < end; i++) {
-          leftoverWords[i] = "";
+          remainingWords[i] = "";
         }
 
         break;
