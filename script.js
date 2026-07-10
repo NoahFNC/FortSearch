@@ -123,6 +123,7 @@ const tagCategories = {
     "Glasses",
     "Goggles",
     "Respirator",
+    "Sun Glasses",
     "Visor",
     "Visor Glasses",
   ],
@@ -394,6 +395,35 @@ const tagCategories = {
   ],
 };
 
+
+// =========================
+// SEARCH ALIASES
+// =========================
+
+const tagAliases = {
+
+  // Sex
+  "guy": "Male",
+  "boy": "Male",
+  "boy": "Young",
+  "man": "Male",
+  "men": "Male",
+  "male character": "Male",
+  "dude": "Male",
+
+  "girl": "Female",
+  "girl": "Young",
+  "woman": "Female",
+  "women": "Female",
+  "female character": "Female",
+  "lady": "Female",
+
+  
+  "future": "Futuristic",
+  "fancy": "Luxury",
+
+};
+
 const allTags = Object.values(tagCategories)
   .flat()
   .sort((a, b) => b.length - a.length);
@@ -402,6 +432,16 @@ const allTags = Object.values(tagCategories)
 
 function parseSearchQuery(searchText) {
   const query = searchText.toLowerCase().trim();
+
+  let processedQuery = query;
+
+  Object.entries(tagAliases).forEach(([alias, tag]) => {
+    const regex = new RegExp(`\\b${alias}\\b`, "gi");
+
+    if (regex.test(processedQuery)) {
+      processedQuery = processedQuery.replace(regex, tag);
+    }
+  });
 
   // =========================
   // NORMAL SEARCH
@@ -418,7 +458,7 @@ function parseSearchQuery(searchText) {
   // AI SEARCH
   // =========================
 
-  let remainingText = query;
+  let remainingText = processedQuery;
 
   const extractedTags = [];
 
