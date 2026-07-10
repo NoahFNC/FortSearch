@@ -258,6 +258,58 @@ body::after{
 
 }
 
+.TimelineFilterMode {
+
+  margin-bottom: 20px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+}
+
+.FilterModeTitle {
+
+  font-family: Fortnite;
+
+  font-size: 22px;
+
+  color: white;
+
+}
+
+#ChapterFilterMode {
+
+  width: 100%;
+
+  padding: 12px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #202020;
+
+  color: white;
+
+  font-family: Fortnite;
+
+  font-size: 20px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+}
+
+#ChapterFilterMode:hover {
+
+  background: #2d2d2d;
+
+}
+
 .TimelineList{
 
     max-height:300px;
@@ -1259,3 +1311,111 @@ opacity:.2;
 
 
 
+
+/* ========================= */
+/* AI SEARCH */
+/* ========================= */
+
+.SearchContainer {
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+}
+
+.SearchBarRow {
+
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+}
+
+#SearchBar {
+
+  flex: 1;
+
+}
+
+.AISearchButton {
+
+  width: 150px;
+
+  height: 44px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-family: Fortnite;
+
+  font-size: 18px;
+
+  background: #303030;
+
+  color: white;
+
+  transition: .2s;
+
+}
+
+.AISearchButton:hover {
+
+  background: #454545;
+
+}
+
+.AISearchButton.Active {
+
+  background: #3d7eff;
+
+}
+
+.AISearchPanel {
+
+  background: rgba(255, 255, 255, .05);
+
+  border: 1px solid rgba(255, 255, 255, .08);
+
+  border-radius: 10px;
+
+  padding: 14px;
+
+  color: white;
+
+  min-height: 70px;
+
+  font-family: Arial;
+
+}
+
+.AISearchTitle {
+
+  font-size: 18px;
+
+  margin-bottom: 8px;
+
+  color: #7fb4ff;
+
+  font-family: Arial;
+
+  font-weight: bolder;
+
+}
+
+.AISearchResults {
+
+  font-size: 15px;
+
+  line-height: 1.6;
+
+  opacity: .9;
+
+  font-family: Arial;
+
+  font-weight: bolder;
+
+}

@@ -1,7 +1,7 @@
 <!doctype html>
 
 <html>
-  <head>
+  <head meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css" />
 
     <title>FortSearch</title>
@@ -130,6 +130,20 @@
 
             <h2 class="PanelTitle">Timeline</h2>
 
+            <div class="TimelineFilterMode">
+
+              <div class="FilterModeTitle">
+                  Filter Mode
+              </div>
+
+              <select id="ChapterFilterMode">
+                  <option value="exact">Exact Chapter</option>
+                  <option value="above">Chapter & Above</option>
+                  <option value="below">Chapter & Below</option>
+              </select>
+
+            </div>
+
             <div id="TimelineList" class="TimelineList">
               
 
@@ -144,7 +158,44 @@
 
         <!-- SEARCH BAR -->
 
-        <input type="text" id="SearchBar" placeholder="Search skins..." />
+        <div class="SearchContainer">
+
+          <div class="SearchBarRow">
+
+              <input
+                  type="text"
+                  id="SearchBar"
+                  placeholder="Search skins..."
+              >
+
+              <button
+                  id="AISearchButton"
+                  class="AISearchButton"
+              >
+                  AI Search: OFF
+              </button>
+
+          </div>
+
+          <div
+              id="AISearchPanel"
+              class="AISearchPanel"
+          >
+
+              <div class="AISearchTitle">
+                  AI Search Disabled
+              </div>
+
+              <div
+                  id="AISearchResults"
+                  class="AISearchResults"
+              >
+                  Searches skin names only.
+              </div>
+
+          </div>
+
+      </div>
 
         <!-- WELCOME PANEL -->
         <div class="WelcomePanel">

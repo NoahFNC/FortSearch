@@ -4,9 +4,53 @@
 
 let showTags = false;
 
-let selectedChapter = null;
+let chapterFilterMode = "exact";
 
+const chapterFilterModeSelect = document.getElementById("ChapterFilterMode");
+
+let selectedChapter = null;
 let selectedSeason = null;
+
+let aiSearchMode = false;
+
+const aiSearchButton = document.getElementById("AISearchButton");
+const aiSearchPanel = document.getElementById("AISearchPanel");
+const aiSearchResults = document.getElementById("AISearchResults");
+
+aiSearchButton.addEventListener("click", () => {
+  aiSearchMode = !aiSearchMode;
+
+  if (aiSearchMode) {
+    aiSearchButton.textContent = "AI Search: ON";
+
+    aiSearchButton.classList.add("Active");
+
+    aiSearchPanel.classList.add("Active");
+
+    aiSearchPanel.querySelector(".AISearchTitle").textContent =
+      "AI Search Enabled";
+
+    aiSearchResults.textContent = "Describe a skin using natural language.";
+
+    searchBar.placeholder = "Describe a skin...";
+  } else {
+    aiSearchButton.textContent = "AI Search: OFF";
+
+    aiSearchButton.classList.remove("Active");
+
+    aiSearchPanel.classList.remove("Active");
+
+    aiSearchPanel.querySelector(".AISearchTitle").textContent =
+      "AI Search Disabled";
+
+    aiSearchResults.textContent = "Searches skin names only.";
+
+    searchBar.placeholder = "Search skin names...";
+  }
+
+  filterSystem();
+});
+
 
 const tagToggle = document.getElementById("TagToggle");
 
@@ -28,6 +72,9 @@ const timelineList = document.getElementById("TimelineList");
 
 let activeTags = [];
 
+
+
+
 tagToggle.addEventListener("change", () => {
 
     showTags = tagToggle.checked;
@@ -35,6 +82,13 @@ tagToggle.addEventListener("change", () => {
     filterSystem();
 
 });
+
+chapterFilterModeSelect.addEventListener("change", () => {
+  chapterFilterMode = chapterFilterModeSelect.value;
+
+  filterSystem();
+});
+
 
 // =========================
 // TAG CATEGORIES
@@ -339,6 +393,87 @@ const tagCategories = {
     "Sword",
   ],
 };
+
+const allTags = Object.values(tagCategories)
+  .flat()
+  .sort((a, b) => b.length - a.length);
+
+
+
+function parseSearchQuery(searchText) {
+  const query = searchText.toLowerCase().trim();
+
+  // =========================
+  // NORMAL SEARCH
+  // =========================
+
+  if (!aiSearchMode) {
+    return {
+      extractedTags: [],
+      nameWords: query.split(/\s+/).filter(Boolean),
+    };
+  }
+
+  // =========================
+  // AI SEARCH
+  // =========================
+
+  let remainingText = query;
+
+  const extractedTags = [];
+
+  // Find tags first
+
+  allTags.forEach((tag) => {
+    const lowerTag = tag.toLowerCase();
+
+    const regex = new RegExp(`\\b${lowerTag}\\b`, "i");
+
+    if (regex.test(remainingText)) {
+
+      extractedTags.push(tag);
+
+      remainingText = remainingText.replace(regex, " ");
+    }
+  });
+
+  // Remaining words
+
+  const leftoverWords = remainingText.split(/\s+/).filter(Boolean);
+
+  const nameWords = [];
+
+  // Check every possible word combination
+  for (let start = 0; start < leftoverWords.length; start++) {
+    for (let end = leftoverWords.length; end > start; end--) {
+      const phrase = leftoverWords.slice(start, end).join(" ");
+
+      const possibleSkin = skins.find(
+        (skin) => skin.Identity.skin_name.toLowerCase() === phrase,
+      );
+
+      if (possibleSkin) {
+        nameWords.push(phrase);
+
+        // Remove used words
+        for (let i = start; i < end; i++) {
+          leftoverWords[i] = "";
+        }
+
+        break;
+      }
+    }
+  }
+
+  // Remove blanks
+  const cleanedNameWords = nameWords.filter(Boolean);
+
+  return {
+    extractedTags,
+    nameWords: cleanedNameWords,
+  };
+}
+
 // =========================
 // CREATE TAG CATEGORIES
 // =========================
@@ -620,34 +755,51 @@ function displaySkins(skinArray) {
 // =========================
 
 function filterSystem() {
-  const searchText = searchBar.value.toLowerCase().trim();
+  const searchText = searchBar.value.trim();
+
+  const parsedSearch = parseSearchQuery(searchText);
+
+  console.log(parsedSearch);
 
   const filteredSkins = skins.filter((skin) => {
-    const searchableText = [
+    const searchableName = [
       skin.Identity.skin_name,
 
       ...(skin.SearchableTerms || []),
-
-      ...(skin.Tags || []),
     ]
       .join(" ")
       .toLowerCase();
 
-     const searchWords = searchText.split(/\s+/).filter((word) => word.length);
+    const nameMatch =
+      parsedSearch.nameWords.length === 0 ||
+      parsedSearch.nameWords.every((word) => searchableName.includes(word));
 
-     const searchMatch = searchWords.every((word) =>
-       searchableText.includes(word),
-     );
 
-    const tagMatch = activeTags.every((tag) => skin.Tags.includes(tag));
+     
 
-    const chapterMatch =
-      selectedChapter === null || skin.Chapter === selectedChapter;
+    const manualTagsMatch = activeTags.every((tag) => skin.Tags.includes(tag));
 
+    const searchTagsMatch = parsedSearch.extractedTags.every((tag) =>
+      skin.Tags.includes(tag),
+    );
+
+    const tagMatch = manualTagsMatch && searchTagsMatch;
+
+    let chapterMatch = true;
+
+    if (selectedChapter !== null) {
+      if (chapterFilterMode === "exact") {
+        chapterMatch = skin.Chapter === selectedChapter;
+      } else if (chapterFilterMode === "above") {
+        chapterMatch = skin.Chapter >= selectedChapter;
+      } else if (chapterFilterMode === "below") {
+        chapterMatch = skin.Chapter <= selectedChapter;
+      }
+    }
     const seasonMatch =
       selectedSeason === null || skin.Season === selectedSeason;
 
-    return searchMatch && tagMatch && chapterMatch && seasonMatch;
+    return nameMatch && tagMatch && chapterMatch && seasonMatch;
   });
 
   displaySkins(filteredSkins);
