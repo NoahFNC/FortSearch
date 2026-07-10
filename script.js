@@ -4,6 +4,10 @@
 
 let showTags = false;
 
+let selectedChapter = null;
+
+let selectedSeason = null;
+
 const tagToggle = document.getElementById("TagToggle");
 
 const skinHub = document.getElementById("SkinHub");
@@ -19,6 +23,8 @@ const overlaySkinName = document.getElementById("OverlaySkinName");
 const skinVideo = document.getElementById("SkinVideo");
 
 const closeButton = document.getElementById("CloseButton");
+
+const timelineList = document.getElementById("TimelineList");
 
 let activeTags = [];
 
@@ -84,6 +90,7 @@ const tagCategories = {
     "Chest plate",
     "Cuisses(Thigh Armor)",
     "Knee Pads",
+    "Rerebrace(Upper Arm)",
     "Shin Guards",
     "Shoulder Pads",
     "Elbow Pads",
@@ -112,6 +119,7 @@ const tagCategories = {
     "Brute",
   ],
 
+  
   "Character Archetype": [
     "Assassin",
     "Civilian",
@@ -163,6 +171,7 @@ const tagCategories = {
     "Formal Shoes",
     "High Heels",
     "Military Boots",
+    "High Military Boots",
     "Sandals",
     "Sneakers",
     "Socks",
@@ -296,6 +305,7 @@ const tagCategories = {
     "Hoodie",
     "Jacket",
     "Long Sleeve",
+    "Muscle Cuirass",
     "Puffy Jacket",
     "Scrunch Sleeve Jacket",
     "Shirtless",
@@ -396,6 +406,140 @@ Object.entries(tagCategories).forEach(([categoryName, tags]) => {
   tagList.appendChild(category);
 });
 
+
+  const timeline = {
+    1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+
+    2: [1, 2, 3, 4, 5, 6, 7, 8],
+
+    3: [1, 2, 3, 4],
+
+    4: [1, 2, 3, 4,"OG"],
+
+    5: [1, 2, 3, 4, ],
+
+    6: [1, 2, "Galactic Battle", 3, 4, "The Simpsons"],
+
+    7: [1,2,3],
+
+    "OG": [1, 2, 3, 4 ,5, 6 , 7 ,8, 9],
+
+    "Remix": []
+
+
+
+  };
+function createTimeline() {
+  timelineList.innerHTML = "";
+
+  const chapterNames = {
+    OG: "Fortnite OG",
+    Remix: "Chapter 2 Remix",
+  };
+
+  Object.entries(timeline).forEach(([chapter, seasons]) => {
+    const category = document.createElement("div");
+    category.classList.add("TimelineCategory");
+
+    const header = document.createElement("div");
+    header.classList.add("TimelineHeader");
+    const chapterName = chapterNames[chapter] ?? `Chapter ${chapter}`;
+
+    header.textContent = `▶ ${chapterName}`;
+
+    header.dataset.chapter = chapter;
+
+    const seasonContainer = document.createElement("div");
+    seasonContainer.classList.add("TimelineSeasons");
+
+    header.addEventListener("click", () => {
+      category.classList.toggle("Open");
+
+      header.textContent = category.classList.contains("Open")
+        ? `▼ ${chapterName}`
+        : `▶ ${chapterName}`;
+
+      const chapterValue = isNaN(chapter) ? chapter : Number(chapter);
+
+      if (selectedChapter === chapterValue) {
+        selectedChapter = null;
+        selectedSeason = null;
+      } else {
+        selectedChapter = chapterValue;
+        selectedSeason = null;
+      }
+
+      updateTimelineSelection();
+      filterSystem();
+    });
+
+    seasons.forEach((season) => {
+      const button = document.createElement("div");
+
+      button.classList.add("SeasonButton");
+
+      button.textContent = `Season ${season}`;
+
+      button.addEventListener("click", (e) => {
+        // Don't trigger the chapter click
+        e.stopPropagation();
+
+        const chapterValue = isNaN(chapter) ? chapter : Number(chapter);
+
+        // Clicking the same season deselects it
+        if (selectedChapter === chapterValue && selectedSeason === season) {
+          selectedSeason = null;
+        } else {
+          selectedChapter = chapterValue;
+          selectedSeason = season;
+        }
+
+        updateTimelineSelection();
+        filterSystem();
+      });
+
+      seasonContainer.appendChild(button);
+    });
+
+    category.appendChild(header);
+    category.appendChild(seasonContainer);
+
+    timelineList.appendChild(category);
+  });
+}
+
+function updateTimelineSelection() {
+  document.querySelectorAll(".TimelineHeader").forEach((header) => {
+    header.classList.remove("Active");
+  });
+
+  document.querySelectorAll(".SeasonButton").forEach((button) => {
+    button.classList.remove("Active");
+  });
+
+  document.querySelectorAll(".TimelineCategory").forEach((category) => {
+    const header = category.querySelector(".TimelineHeader");
+
+    const chapter = header.dataset.chapter;
+
+    const chapterValue = isNaN(chapter) ? chapter : Number(chapter);
+
+    if (chapterValue === selectedChapter) {
+      header.classList.add("Active");
+
+      if (selectedSeason !== null) {
+        category.querySelectorAll(".SeasonButton").forEach((button) => {
+          const season = Number(button.textContent.replace("Season ", ""));
+
+          if (season === selectedSeason) {
+            button.classList.add("Active");
+          }
+        });
+      }
+    }
+  });
+}
+
 // =========================
 // OPEN OVERLAY
 // =========================
@@ -469,6 +613,8 @@ function displaySkins(skinArray) {
   });
 }
 
+
+
 // =========================
 // FILTER SYSTEM
 // =========================
@@ -477,21 +623,31 @@ function filterSystem() {
   const searchText = searchBar.value.toLowerCase().trim();
 
   const filteredSkins = skins.filter((skin) => {
-    const searchableText = `
+    const searchableText = [
+      skin.Identity.skin_name,
 
-        ${skin.Identity.skin_name}
+      ...(skin.SearchableTerms || []),
 
-        ${skin.SearchableTerms.join(" ")}
+      ...(skin.Tags || []),
+    ]
+      .join(" ")
+      .toLowerCase();
 
-        ${skin.Tags.join(" ")}
+     const searchWords = searchText.split(/\s+/).filter((word) => word.length);
 
-      `.toLowerCase();
-
-    const searchMatch = searchableText.includes(searchText);
+     const searchMatch = searchWords.every((word) =>
+       searchableText.includes(word),
+     );
 
     const tagMatch = activeTags.every((tag) => skin.Tags.includes(tag));
 
-    return searchMatch && tagMatch;
+    const chapterMatch =
+      selectedChapter === null || skin.Chapter === selectedChapter;
+
+    const seasonMatch =
+      selectedSeason === null || skin.Season === selectedSeason;
+
+    return searchMatch && tagMatch && chapterMatch && seasonMatch;
   });
 
   displaySkins(filteredSkins);
@@ -529,8 +685,9 @@ skinOverlay.addEventListener("click", (event) => {
 
 // =========================
 // INITIAL LOAD
-// =========================
 
+// =========================
+createTimeline();
 displaySkins(skins);
 
 const enterButton = document.getElementById("EnterButton");

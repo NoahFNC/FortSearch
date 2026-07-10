@@ -221,6 +221,167 @@ body::after{
   align-items: flex-start;
 }
 
+.LeftPanels{
+
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+
+}
+
+.TimelinePanel {
+
+  position: absolute;
+
+  width: 300px;
+
+  left: 1400px;
+
+  top: 230px;
+
+  background:
+    linear-gradient(180deg,
+      rgba(24, 24, 28, .95),
+      rgba(12, 12, 16, .95));
+
+  border-radius: 25px;
+
+  padding: 25px;
+
+  border: 1px solid rgba(255, 255, 255, .04);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, .45),
+    inset 0 0 1px rgba(255, 255, 255, .2);
+
+  overflow: hidden;
+
+  font-family: Fortnite;
+
+}
+
+.TimelineList{
+
+    max-height:300px;
+
+    overflow-y:auto;
+
+}
+
+.TimelineHeader {
+
+  width: 100%;
+
+  padding: 14px 18px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #202020;
+
+  color: white;
+
+  font-family: Fortnite;
+
+  font-size: 24px;
+
+  letter-spacing: .5px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: .2s;
+
+}
+
+.TimelineHeader:hover {
+
+  background: #2f2f2f;
+
+}
+
+.TimelineSeasons {
+
+  display: none;
+
+  padding-left: 15px;
+
+}
+
+.TimelineCategory.Open .TimelineSeasons {
+
+  display: block;
+
+}
+
+.SeasonButton {
+
+  width: 100%;
+
+  margin: 6px 0;
+
+  padding: 12px 18px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #181818;
+
+  color: #d5d5d5;
+
+  font-family: Arial;
+
+  font-weight: bolder;
+
+  font-size: 18px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: .2s;
+
+}
+
+.SeasonButton:hover {
+
+  background: #2d2d2d;
+
+  color: white;
+
+  transform: translateX(6px);
+
+}
+
+.TimelineHeader.Active {
+
+  background: #4f8fff;
+
+  color: white;
+
+  box-shadow:
+    0 0 15px rgba(79, 143, 255, .5);
+
+}
+
+.SeasonButton.Active {
+
+  background: #4f8fff;
+
+  color: white;
+
+  font-weight: bold;
+
+  box-shadow:
+    0 0 12px rgba(79, 143, 255, .45);
+
+}
+
+
+
 
 /* ========================= */
 /* TAG PANEL */
@@ -322,6 +483,7 @@ body::after{
   display: flex;
   flex-direction: column;
 
+
   gap: 25px;
 }
 
@@ -361,6 +523,7 @@ body::after{
 .WelcomePanel{
 
     width:380px;
+
 
     position:relative;
 

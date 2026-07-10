@@ -9,6 +9,8 @@ const skins = [
     isEditStyle: false,
     icon: undefined,
     video: undefined,
+    Chapter: 3,
+    Season: 3,
 
     Identity: {
       skin_name: "'Mato Marauder",
@@ -33,7 +35,7 @@ const skins = [
       "Tracksuit Jacket",
     ],
 
-    SearchableTerms: [],
+
   },
 
   {
@@ -42,6 +44,8 @@ const skins = [
     isEditStyle: false,
     icon: undefined,
     video: undefined,
+    Chapter: "Remix",
+    Season: "",
 
     Identity: {
       skin_name: "1-Ball",
@@ -67,15 +71,14 @@ const skins = [
       "Tactical",
     ],
 
-    SearchableTerms: [],
   },
 
   {
     id: "15288",
 
     isEditStyle: true,
-    
-    icon: "Images/Skins/1-Ball_29_-_Outfit_-_Fortnite.png",
+
+    icon: "Images/Skins/T_Soldier_StageCue_ChalkJacket.png",
     video: "https://fnggcdn.com/items/15288/video-1-2-1.mp4?2",
 
     Identity: {
@@ -99,7 +102,6 @@ const skins = [
       "Puffy Jacket",
     ],
 
-    SearchableTerms: [],
   },
 
   {
@@ -111,22 +113,29 @@ const skins = [
     },
 
     Tags: [
+      "Ammo Pouch",
+      "Young",
+      "Non Cell Shaded",
+      "Chest plate",
+      "Cuisses(Thigh Armor)",
       "Knee Pads",
-      "Elbow Pads",
-      "Chestplate",
-      "Tactical",
-      "Slim",
-      "Armor",
-      "Armored Boots",
+      "Shin Guards",
+      "Rerebrace(Upper Arm)",
+      "Military Belt",
+      "Human",
+      "Average",
+      "Ninja",
+      "Unitard",
+      "Armored",
+      "High Military Boots",
       "Female",
       "Clean Gloves",
+      "Ponytail",
+      "Wavy Hair",
       "Helmet",
       "Tactical",
-      "Ponytail",
-      "Tactical Belt",
     ],
 
-    SearchableTerms: ["tactical armour"],
   },
 
   {
@@ -148,7 +157,6 @@ const skins = [
       "Mask",
     ],
 
-    SearchableTerms: [],
   },
 
   {
@@ -182,7 +190,6 @@ const skins = [
       "Space",
     ],
 
-    SearchableTerms: [""],
   },
 
   {
@@ -208,7 +215,6 @@ const skins = [
       "Sleeveless Dress Shirt",
     ],
 
-    SearchableTerms: ["band gorillaz"],
   },
 
   {
@@ -242,7 +248,6 @@ const skins = [
       "Space",
     ],
 
-    SearchableTerms: [""],
   },
 
   {
@@ -255,7 +260,6 @@ const skins = [
 
     Tags: [],
 
-    SearchableTerms: [],
   },
 
   {
@@ -276,7 +280,6 @@ const skins = [
       "Weapons",
     ],
 
-    SearchableTerms: ["tactical armour"],
   },
 
   {
@@ -289,7 +292,6 @@ const skins = [
 
     Tags: ["Animal", "Goat", "Casual", "Unisex"],
 
-    SearchableTerms: ["Horns", "converse", "jeans", "skinny jeans"],
   },
 
   {
@@ -302,7 +304,6 @@ const skins = [
 
     Tags: ["Futuristic", "Apocalyptic", "Male", "Cyborg", "Robot"],
 
-    SearchableTerms: ["machine"],
   },
 
   {
@@ -322,7 +323,6 @@ const skins = [
       "Earrings",
     ],
 
-    SearchableTerms: ["Necklace", "Earrings"],
   },
 
   {
@@ -333,9 +333,8 @@ const skins = [
       rarity: "Epic",
     },
 
-    Tags: ["Young Male", "Cartoon", "Asian", "Toga"],
+    Tags: ["Young Male", "Cartoon", "Asian", "Toga", "Anime",],
 
-    SearchableTerms: ["Toga", "Monk", "Bald"],
   },
 
   {
@@ -348,7 +347,6 @@ const skins = [
 
     Tags: ["Horror", "Hood", "Male"],
 
-    SearchableTerms: ["Leather"],
   },
 
   {
@@ -361,7 +359,6 @@ const skins = [
 
     Tags: ["Defualt", "Goggles", "Facial Hair", "Male"],
 
-    SearchableTerms: ["Artic"],
   },
 
   {
@@ -382,7 +379,6 @@ const skins = [
       "Male",
     ],
 
-    SearchableTerms: [""],
   },
 
   {
@@ -395,7 +391,6 @@ const skins = [
 
     Tags: ["Female", "Ponytail", "Braids", "Earrings"],
 
-    SearchableTerms: ["eyes", "braids", "bell bottoms"],
   },
 
   {
@@ -408,7 +403,6 @@ const skins = [
 
     Tags: ["Cell shaded", "School", "Female", "Skirt", "Casual", "Short Hair"],
 
-    SearchableTerms: ["Academy"],
   },
 
   {
@@ -421,7 +415,6 @@ const skins = [
 
     Tags: ["Male", "Luxury", "Suit", "Mask"],
 
-    SearchableTerms: [""],
   },
 
   {
@@ -434,7 +427,6 @@ const skins = [
 
     Tags: ["Futuristic", "Cyborg", "Male", "Robot"],
 
-    SearchableTerms: [""],
   },
 
   {
@@ -447,7 +439,6 @@ const skins = [
 
     Tags: ["Female", "Nose Ring", "Dreads", "Piercings", "Nails", "Dark Skin"],
 
-    SearchableTerms: [""],
   },
 
   {
@@ -460,7 +451,6 @@ const skins = [
 
     Tags: ["Hood", "Casual", "Female", "Hat", "Visor Glasses"],
 
-    SearchableTerms: [""],
   },
 
   {
@@ -473,7 +463,6 @@ const skins = [
 
     Tags: ["Tactical", "Female", "Unique Hairstyle"],
 
-    SearchableTerms: [""],
   },
 
   {
@@ -486,7 +475,6 @@ const skins = [
 
     Tags: ["Dark Skin", "Male", "Athletic", "Fade", "Shorts"],
 
-    SearchableTerms: ["Boxing", "Boxer"],
   },
 
   {
@@ -499,7 +487,6 @@ const skins = [
 
     Tags: ["Food", "Peely", "Bandanna", "Cartoon", "Goggles"],
 
-    SearchableTerms: ["banana", "yellow", "cartoon"],
   },
 
   {
@@ -512,7 +499,6 @@ const skins = [
 
     Tags: ["Military", "Pilot", "Helmet", "Jacket"],
 
-    SearchableTerms: [""],
   },
 
   {
@@ -525,19 +511,7 @@ const skins = [
 
     Tags: ["Male", "Luxury", "Gold"],
 
-    SearchableTerms: [
-      "gold chain",
-      "necklace",
-      "gold necklace",
-      "slicked hair",
-      "dress shirt",
-      "watch",
-      "blonde hair",
-      "tattoos",
-      "suit",
-      "rich",
-      "boss",
-    ],
+   
   },
 
   {
@@ -550,7 +524,6 @@ const skins = [
 
     Tags: ["Cartoon", "Food", "Male", "Peely"],
 
-    SearchableTerms: ["banana", "yellow", "cartoon"],
   },
 
   {
@@ -563,18 +536,7 @@ const skins = [
 
     Tags: ["Male", "Streetwear", "Futuristic", "Asian"],
 
-    SearchableTerms: [
-      "hoodie",
-      "mask",
-      "pink jacket",
-      "streetwear",
-      "anime hair",
-      "white sneakers",
-      "kitsune",
-      "fox mask",
-      "jacket",
-      "sun glasses",
-    ],
+    
   },
 
   {
@@ -595,7 +557,6 @@ const skins = [
       "Weapons",
     ],
 
-    SearchableTerms: ["short hair", "red hair"],
   },
 ];
 
