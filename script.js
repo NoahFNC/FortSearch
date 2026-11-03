@@ -1608,65 +1608,146 @@ function openSkinOverlay(skin) {
   if (skin.video) skinVideo.play().catch(() => {});
 }
 
+// =========================
+// OPTIMIZED SKIN CARD RENDERER
+// =========================
+
+let skinRenderVersion = 0;
+
+const SKIN_RENDER_BATCH_SIZE = 60;
+
 function displaySkins(skinArray) {
-  skinHub.replaceChildren();
-  if (!skinArray.length) {
-    const empty = document.createElement("p");
-    empty.className = "NoResults";
-    empty.textContent = "No matching skins found.";
-    skinHub.appendChild(empty);
-    return;
-  }
-  const fragment = document.createDocumentFragment();
-  skinArray.forEach(skin => {
-    const card = document.createElement("div");
-    card.className = "SkinCard";
-    card.addEventListener("click", () => openSkinOverlay(skin));
-    const name = document.createElement("h3");
-    name.className = "SkinName";
-    name.textContent = skin.Identity?.skin_name || "Unknown Outfit";
-    const image = document.createElement("img");
-    image.src = skin.icon || "";
-    image.alt = skin.Identity?.skin_name || "Fortnite outfit";
-    image.loading = "lazy";
-    image.onerror = () => { image.alt = "Image unavailable"; };
 
-    // Hover video preview (Fortnite.GG CDN); click still opens the full skin overlay.
-    if (skin.video) {
-      const preview = document.createElement("video");
-      preview.className = "SkinHoverVideo";
-      preview.src = skin.video;
-      preview.muted = true;
-      preview.loop = true;
-      preview.playsInline = true;
-      preview.preload = "none";
-      card.addEventListener("mouseenter", () => {
-        preview.play().catch(() => {});
-      });
-      card.addEventListener("mouseleave", () => {
-        preview.pause();
-        try { preview.currentTime = 0; } catch (_) {}
-      });
-      card.append(name,image,preview);
-    } else {
-      card.append(name,image);
+    // Cancel any previous rendering operation.
+    const currentRender = ++skinRenderVersion;
+
+    skinHub.replaceChildren();
+
+    if (!skinArray.length) {
+        const empty = document.createElement("p");
+        empty.className = "NoResults";
+        empty.textContent = "No matching skins found.";
+        skinHub.appendChild(empty);
+        return;
     }
-    if (showTags && (skin.Tags || []).length) {
-      const tags = document.createElement("div");
-      tags.className = "CardTags";
-      skin.Tags.forEach(tag => {
-        const el = document.createElement("span");
-        el.className = "CardTag";
-        el.textContent = tag;
-        tags.appendChild(el);
-      });
-      card.appendChild(tags);
+
+    let currentIndex = 0;
+
+    function renderBatch() {
+
+        // A newer search/filter may have started.
+        if (currentRender !== skinRenderVersion) return;
+
+        const fragment = document.createDocumentFragment();
+
+        const batchEnd = Math.min(
+            currentIndex + SKIN_RENDER_BATCH_SIZE,
+            skinArray.length
+        );
+
+        for (; currentIndex < batchEnd; currentIndex++) {
+
+            const skin = skinArray[currentIndex];
+
+            const card = document.createElement("div");
+            card.className = "SkinCard";
+
+            // Clicking the card still opens its full information overlay.
+            card.addEventListener("click", () => {
+                openSkinOverlay(skin);
+            });
+
+            const name = document.createElement("h3");
+            name.className = "SkinName";
+            name.textContent =
+                skin.Identity?.skin_name || "Unknown Outfit";
+
+            const image = document.createElement("img");
+
+            image.src = skin.icon || "";
+            image.alt =
+                skin.Identity?.skin_name || "Fortnite outfit";
+
+            image.loading = "lazy";
+            image.decoding = "async";
+
+            image.onerror = () => {
+                image.alt = "Image unavailable";
+            };
+
+            card.append(name, image);
+
+            // Create the video ONLY when the user hovers over this card.
+            if (skin.video) {
+
+                let preview = null;
+
+                card.addEventListener("mouseenter", () => {
+
+                    if (!preview) {
+
+                        preview = document.createElement("video");
+
+                        preview.className = "SkinHoverVideo";
+                        preview.muted = true;
+                        preview.loop = true;
+                        preview.playsInline = true;
+                        preview.preload = "none";
+
+                        preview.src = skin.video;
+
+                        card.appendChild(preview);
+                    }
+
+                    preview.play().catch(() => {});
+                });
+
+                card.addEventListener("mouseleave", () => {
+
+                    if (preview) {
+                        preview.pause();
+
+                        try {
+                            preview.currentTime = 0;
+                        } catch (_) {}
+                    }
+                });
+            }
+
+            // Preserve the Show Tags feature.
+            if (showTags && (skin.Tags || []).length) {
+
+                const tags = document.createElement("div");
+                tags.className = "CardTags";
+
+                skin.Tags.forEach(tag => {
+
+                    const element = document.createElement("span");
+
+                    element.className = "CardTag";
+                    element.textContent = tag;
+
+                    tags.appendChild(element);
+                });
+
+                card.appendChild(tags);
+            }
+
+            fragment.appendChild(card);
+        }
+
+        // Add this batch to the page.
+        skinHub.appendChild(fragment);
+
+        // Yield control to the browser before rendering the next batch.
+        if (currentIndex < skinArray.length) {
+            requestAnimationFrame(renderBatch);
+        }
     }
-    fragment.appendChild(card);
-  });
-  skinHub.appendChild(fragment);
+
+    // Start rendering the first batch.
+    requestAnimationFrame(renderBatch);
 }
-
 
 // =========================
 // FILTER SYSTEM
