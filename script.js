@@ -1,4 +1,460 @@
 // =========================
+// FORTNITE API DATA
+// =========================
+const FORTNITE_API_URL = "https://fortnite-api.com/v2/cosmetics/br?language=en";
+const fortSearchMetadata = window.skinMetadata || [];
+
+
+// ============================================================
+// FORTNITE.GG ID -> FORTNITE API ID CROSS-REFERENCE
+// ============================================================
+
+let metadataByApiId = new Map();
+
+function parseCSV(csvText) {
+  const rows = [];
+  let row = [];
+  let value = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < csvText.length; i++) {
+    const char = csvText[i];
+    const next = csvText[i + 1];
+
+    if (char === '"' && insideQuotes && next === '"') {
+      value += '"';
+      i++;
+    } else if (char === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (char === "," && !insideQuotes) {
+      row.push(value.trim());
+      value = "";
+    } else if ((char === "\n" || char === "\r") && !insideQuotes) {
+      if (char === "\r" && next === "\n") i++;
+
+      row.push(value.trim());
+
+      if (row.some(cell => cell !== "")) {
+        rows.push(row);
+      }
+
+      row = [];
+      value = "";
+    } else {
+      value += char;
+    }
+  }
+
+  row.push(value.trim());
+
+  if (row.some(cell => cell !== "")) {
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+
+async function loadFortniteIdCrossReference() {
+  try {
+    console.log("Loading Fortnite.GG ID cross-reference...");
+
+    const response = await fetch("fortnite-outfit-id-map.csv");
+
+    if (!response.ok) {
+      throw new Error(`CSV request failed: ${response.status}`);
+    }
+
+    const csvText = await response.text();
+    const rows = parseCSV(csvText);
+
+    if (rows.length < 2) {
+      throw new Error("The cross-reference CSV is empty.");
+    }
+
+    const headers = rows[0].map(header =>
+      header.trim().toLowerCase()
+    );
+
+    const nameIndex = headers.indexOf("skin name");
+    const apiIdIndex = headers.indexOf("fortnite api id");
+    const ggIdIndex = headers.indexOf("fortnite.gg id");
+    const typeIndex = headers.indexOf("type");
+
+    if ([nameIndex, apiIdIndex, ggIdIndex, typeIndex].includes(-1)) {
+      throw new Error("One or more required CSV columns are missing.");
+    }
+
+    // First, index data.js entries by their original GG numeric ID.
+    const metadataByGgId = new Map();
+
+    for (const metadata of fortSearchMetadata) {
+      if (metadata.isEditStyle) continue;
+
+      const ggId = String(
+        metadata.fortniteGgId ?? metadata.id ?? ""
+      ).trim();
+
+      if (!/^\d+$/.test(ggId)) continue;
+
+      if (!metadataByGgId.has(ggId)) {
+        metadataByGgId.set(ggId, metadata);
+      }
+    }
+
+    const newMetadataByApiId = new Map();
+    const ambiguousIds = new Set();
+
+    let outfitRows = 0;
+    let matchedRows = 0;
+    let unmatchedRows = 0;
+
+    for (const row of rows.slice(1)) {
+      const type = row[typeIndex]?.trim().toLowerCase();
+
+      // Only process outfits.
+      if (type !== "outfit") continue;
+
+      outfitRows++;
+
+      const apiId = row[apiIdIndex]?.trim();
+      const ggId = row[ggIdIndex]?.trim();
+
+      if (!apiId || !/^\d+$/.test(ggId || "")) {
+        unmatchedRows++;
+        continue;
+      }
+
+      const metadata = metadataByGgId.get(ggId);
+
+      if (!metadata) {
+        unmatchedRows++;
+        continue;
+      }
+
+      // Detect conflicting API IDs instead of silently choosing one.
+      if (newMetadataByApiId.has(apiId)) {
+        const existing = newMetadataByApiId.get(apiId);
+
+        if (existing !== metadata) {
+          newMetadataByApiId.delete(apiId);
+          ambiguousIds.add(apiId);
+          console.warn("Ambiguous Fortnite API ID:", apiId);
+        }
+
+        continue;
+      }
+
+      if (ambiguousIds.has(apiId)) continue;
+
+      // Preserve the original Fortnite.GG ID.
+      metadata.fortniteGgId = metadata.fortniteGgId ?? metadata.id;
+
+      newMetadataByApiId.set(apiId, metadata);
+      matchedRows++;
+    }
+
+    // Do not allow ambiguous IDs to be used.
+    for (const apiId of ambiguousIds) {
+      newMetadataByApiId.delete(apiId);
+    }
+
+    metadataByApiId = newMetadataByApiId;
+
+    console.log("Fortnite.GG cross-reference loaded!");
+    console.log("Outfit rows:", outfitRows);
+    console.log("Matched data.js entries:", matchedRows);
+    console.log("Unmatched rows:", unmatchedRows);
+    console.log("Ambiguous API IDs:", ambiguousIds.size);
+    console.log("Usable API ID mappings:", metadataByApiId.size);
+
+  } catch (error) {
+    console.error("Failed to load Fortnite.GG cross-reference:", error);
+    metadataByApiId = new Map();
+  }
+
+  console.log("Cross-reference map size:", metadataByApiId.size);
+
+  console.log(
+    "First 10 mapped API IDs:",
+    [...metadataByApiId.keys()].slice(0, 10)
+  );
+
+  console.log(
+    "Test API ID:",
+    metadataByApiId.has("CID_A_333_Athena_Commando_M_Solstice_C1YP3")
+  );
+}
+
+
+
+
+
+let skins = [];
+let cosmeticsLoaded = false;
+
+function normalizeCosmeticName(value) {
+  return String(value || "").toLowerCase().replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function getIntroductionPart(value) {
+  if (value === undefined || value === null || value === "") return null;
+  const text = String(value);
+  const match = text.match(/(\d+)/);
+  if (match) return Number(match[1]);
+  if (/og/i.test(text)) return "OG";
+  if (/remix/i.test(text)) return "Remix";
+  return text;
+}
+
+function mergeApiCosmetic(apiCosmetic) {
+  const apiName = apiCosmetic.name || "Unknown Outfit";
+
+  // Match using the Fortnite API ID.
+  const metadata = metadataByApiId.get(apiCosmetic.id) || null;
+
+  console.log("Skin:", apiCosmetic.name);
+  console.log("API ID:", apiCosmetic.id);
+  console.log("Metadata found:", !!metadata);
+  console.log("Matched metadata:", metadata);
+  console.log("Tags:", metadata?.Tags);
+
+  const intro = apiCosmetic.introduction || {};
+
+  if (metadata) {
+    metadata.fortniteGgId =
+      metadata.fortniteGgId ?? metadata.id ?? null;
+
+    metadata.id = apiCosmetic.id;
+  }
+
+  const fortniteGgId = metadata?.fortniteGgId ?? null;
+
+  return {
+    id: apiCosmetic.id,
+    fortniteGgId,
+
+    isEditStyle: false,
+    entryKey: apiCosmetic.id,
+
+    Identity: {
+      skin_name: apiName
+    },
+
+    Rarity:
+      apiCosmetic.displayRarity ||
+      apiCosmetic.rarity?.displayValue ||
+      metadata?.Rarity ||
+      "Unknown",
+
+    Chapter:
+      getIntroductionPart(intro.chapter) ??
+      metadata?.Chapter ??
+      null,
+
+    Season:
+      getIntroductionPart(intro.season) ??
+      metadata?.Season ??
+      null,
+
+    Source: metadata?.Source || "Unknown",
+
+    Codename: (() => {
+      const id = apiCosmetic.id || "";
+
+      const match = id.match(
+        /(?:Athena_Commando_[MF]|Character)_(.+)$/i
+      );
+
+      return match ? match[1] : "Unknown";
+    })(),
+
+    Tags: metadata?.Tags || [],
+
+    SearchableTerms: metadata?.SearchableTerms || [],
+
+    icon:
+      apiCosmetic.images?.icon ||
+      apiCosmetic.images?.smallIcon ||
+      "",
+
+    video:
+      metadata?.video ||
+      (fortniteGgId
+        ? `https://fnggcdn.com/items/${fortniteGgId}/video.mp4?2`
+        : null),
+
+    API: apiCosmetic
+  };
+}
+
+// Fortnite-API represents an outfit's styles as variants of the parent outfit,
+// not as separate cosmetic records. FortSearch creates separate searchable cards
+// for manually curated edit styles while retaining the parent's API ID/data.
+
+
+function buildEditStyleEntries(baseSkins, useFortniteGgIcons = false) {
+  return fortSearchMetadata
+    .filter(metadata => metadata.isEditStyle)
+    .map(metadata => {
+      // Find the parent using the original Fortnite.GG ID.
+      const metadataParentId = String(
+        metadata.fortniteGgId ?? metadata.id ?? ""
+      );
+
+      const parentMetadata = fortSearchMetadata.find(item =>
+        !item.isEditStyle &&
+        String(item.fortniteGgId ?? item.id ?? "") === metadataParentId
+      );
+
+      if (!parentMetadata) {
+        console.warn("Edit style parent metadata not found:", metadata);
+        return null;
+      }
+
+      // Find the corresponding API outfit using its metadata object.
+      const parent = baseSkins.find(skin =>
+        skin.fortniteGgId === metadataParentId
+      );
+
+      if (!parent) {
+        console.warn("Edit style API parent not found:", {
+          style: metadata.Identity?.skin_name,
+          fortniteGgId: metadataParentId
+        });
+        return null;
+      }
+
+      const styleFortniteGgId = metadata.fortniteGgId ?? metadata.id;
+
+      return {
+        ...parent,
+        id: parent.id,
+        entryKey: `${parent.id}::style::${normalizeCosmeticName(metadata.Identity?.skin_name)}`,
+        fortniteGgId: styleFortniteGgId,
+        isEditStyle: true,
+
+        Identity: {
+          skin_name: metadata.Identity?.skin_name || `${parent.Identity.skin_name} [Style]`
+        },
+
+        Tags: metadata.Tags || [],
+        SearchableTerms: metadata.SearchableTerms || [],
+
+        icon: useFortniteGgIcons
+          ? (metadata.icon || (styleFortniteGgId
+              ? `Images/Skins/${styleFortniteGgId}.jpg`
+              : parent.icon))
+          : (metadata.icon || parent.icon),
+
+        video: metadata.video || (styleFortniteGgId
+          ? `https://fnggcdn.com/items/${styleFortniteGgId}/video.mp4?2`
+          : parent.video),
+
+        API: parent.API,
+        Chapter: metadata.Chapter ?? parent.Chapter,
+        Season: metadata.Season ?? parent.Season,
+        Rarity: metadata.Rarity || parent.Rarity,
+        Source: metadata.Source || parent.Source,
+        Codename: metadata.Codename || parent.Codename
+      };
+    })
+    .filter(Boolean);
+}
+
+
+
+// Build a small offline database from the manually curated entries in data.js.
+// This is intentionally limited to the outfits/styles that have been added there.
+function buildLocalMetadataDatabase() {
+  const baseSkins = fortSearchMetadata
+    .filter(item => !item.isEditStyle)
+    .map(item => ({
+      ...item,
+      id: item.id || `local-${normalizeCosmeticName(item.Identity?.skin_name).replace(/\s+/g, "-")}`,
+      entryKey: `local-${normalizeCosmeticName(item.Identity?.skin_name)}`,
+      fortniteGgId: item.fortniteGgId ?? item.id ?? null,
+      isEditStyle: false,
+      Identity: { skin_name: item.Identity?.skin_name || "Unknown Outfit" },
+      Tags: item.Tags || [],
+      SearchableTerms: item.SearchableTerms || [],
+      icon: item.icon || ((item.fortniteGgId ?? item.id)
+        ? `Images/Skins/${item.fortniteGgId ?? item.id}.jpg`
+        : ""),
+      video: item.video || (
+  (item.fortniteGgId ?? item.id)
+    ? `https://fnggcdn.com/items/${item.fortniteGgId ?? item.id}/video.mp4?2`
+    : null
+),
+      API: null
+    }));
+
+  return [...baseSkins, ...buildEditStyleEntries(baseSkins, true)];
+}
+
+async function loadFortniteCosmetics() {
+  const loadingMessage = document.getElementById("LoadingMessage");
+  const loadingPanel = document.getElementById("LoadingPanel");
+  const enterButton = document.getElementById("EnterButton");
+
+  if (loadingPanel) loadingPanel.style.display = "block";
+  if (loadingMessage) loadingMessage.textContent = "Downloading Fortnite cosmetic database...";
+
+  try {
+     // Load the Fortnite.GG ID → Fortnite API ID mappings first.
+    await loadFortniteIdCrossReference();
+
+    const response = await fetch(FORTNITE_API_URL);
+    if (!response.ok) throw new Error(`Fortnite API returned HTTP ${response.status}`);
+
+    const payload = await response.json();
+    if (!Array.isArray(payload.data)) throw new Error("Unexpected Fortnite API response.");
+
+    // FortSearch is a skin finder: load Battle Royale outfits only.
+    const baseSkins = payload.data
+      .filter(item => item.type?.value === "outfit" || item.type?.backendValue === "AthenaCharacter")
+      .map(mergeApiCosmetic);
+
+    if (!baseSkins.length) throw new Error("The API returned no Battle Royale outfits.");
+
+    // Add curated edit styles as their own results, rather than hiding them
+    // inside the parent outfit or discarding them during API matching.
+    skins = [...baseSkins, ...buildEditStyleEntries(baseSkins)];
+
+    cosmeticsLoaded = true;
+    createTimeline();
+    filterSystem();
+
+    if (loadingMessage) loadingMessage.textContent = `Loaded ${skins.length.toLocaleString()} Fortnite outfits!`;
+    if (loadingPanel) loadingPanel.style.display = "none";
+    if (enterButton) enterButton.disabled = false;
+  } catch (error) {
+    console.error("Fortnite cosmetic database error:", error);
+    if (loadingMessage) loadingMessage.textContent =
+      `Unable to load Fortnite cosmetics: ${error.message}. Refresh to try again.`;
+    // The live API is unavailable: fall back to the manually curated data.js entries.
+    skins = buildLocalMetadataDatabase();
+
+    if (skins.length) {
+      cosmeticsLoaded = true;
+      createTimeline();
+      filterSystem();
+      if (loadingMessage) {
+        loadingMessage.textContent = `Fortnite-API unavailable. Loaded ${skins.length.toLocaleString()} locally saved outfits/styles.`;
+      }
+      if (loadingPanel) loadingPanel.style.display = "block";
+      if (enterButton) enterButton.disabled = false;
+    } else {
+      if (loadingMessage) loadingMessage.textContent = `Unable to load Fortnite cosmetics: ${error.message}. No local entries were found in data.js.`;
+      if (loadingPanel) loadingPanel.style.display = "block";
+      if (enterButton) enterButton.disabled = false;
+      if (skinHub) skinHub.textContent = "Could not connect to Fortnite-API.com, and data.js contains no local outfits.";
+    }
+  }
+}
+
+// =========================
 // VARIABLES
 // =========================
 const overlaySkinName = document.getElementById("OverlaySkinName");
@@ -41,9 +497,9 @@ aiSearchButton.addEventListener("click", () => {
 
     aiSearchResults.innerHTML = `Describe a skin using natural language.<br><br>
     <span class="Warning">
-    ⚠ Warning: Do not use when searching for multiple highly specific pieces. Instead, use the regular tags panel!
-    </span>`;
-
+    ⚠ Warning: Do not use when searching for skin names. Instead, use the regular search mode!
+    </span>`
+  
     searchBar.placeholder = "Describe a skin...";
   } else {
     aiSearchButton.textContent = "AI Search: OFF";
@@ -71,19 +527,31 @@ const skinHub = document.getElementById("SkinHub");
 const searchBar = document.getElementById("SearchBar");
 
 const tagList = document.getElementById("TagList");
+const tagMatchModeSelect = document.getElementById("TagMatchMode");
+if (tagMatchModeSelect) {
+  tagMatchModeSelect.addEventListener("change", () => {
+    manualTagMatchMode = tagMatchModeSelect.value === "any" ? "any" : "all";
+    filterSystem();
+  });
+}
 
 
 
 const timelineList = document.getElementById("TimelineList");
 
 let activeTags = [];
+// Manual tag-panel matching mode: "all" requires every selected tag; "any" requires at least one.
+let manualTagMatchMode = "all";
 
-closeButton.addEventListener("click", () => {
+function closeSkinOverlay() {
   skinOverlay.style.display = "none";
-
   skinVideo.pause();
   skinVideo.src = "";
-});
+  const videoContainer = skinVideo.closest(".OverlayVideo");
+  if (videoContainer) videoContainer.style.display = "block";
+}
+
+closeButton.addEventListener("click", closeSkinOverlay);
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && skinOverlay.style.display === "flex") {
@@ -130,14 +598,18 @@ const tagCategories = {
     "Choker",
     "Claws",
     "Harness",
+    "Headphones",
     "Holster",
     "Necklace",
     "Nails",
     "Pouches",
     "Sash",
     "Shoulder Bag",
+    "Shotgun Shells",
+    "Storm Tracker",
     "Ring",
     "Scarf",
+    "Walkman",
     "Watch",
   ],
 
@@ -160,23 +632,24 @@ const tagCategories = {
     "Drop[Earrings]",
   ],
 
-  Age: ["Middle Aged", "Old", "Young",],
+  Age: ["Middle Aged", "Old", "Young", "Young-Adult"],
 
-  "Art Style": ["Anime", "Cartoon", "Cell shaded", "Non Cell Shaded",],
-  
+  "Art Style": ["Anime", "Cartoon", "Cell shaded", "Non Cell Shaded"],
+
   Armor: [
-    "Arm Bracers",
+    "Armguard",
     "Armored Vest",
     "Chest plate",
     "Cuisses(Thigh Armor)",
     "Knee Pads",
+    "Knee-Shin Guards",
     "Rerebrace(Upper Arm)",
     "Shin Guards",
     "Shoulder Pads",
-    "Elbow Pads",
+    "Elbow Pads", 
   ],
 
-  Belt: ["Military Belt", "Tactical Belt", "Obi",],
+  Belt: ["Military Belt", "Tactical Belt", "Obi"],
 
   Species: [
     "Alien",
@@ -204,8 +677,8 @@ const tagCategories = {
     "Brute",
   ],
 
-  
   "Character Archetype": [
+    "Agent",
     "Assassin",
     "Civilian",
     "Hunter",
@@ -214,6 +687,7 @@ const tagCategories = {
     "Ninja",
     "Peely",
     "Pilot",
+    "Pirate",
     "Samurai",
     "Scientist",
     "Soldier",
@@ -221,7 +695,7 @@ const tagCategories = {
     "Villain",
   ],
 
-  "Facial Hair": ["Beard", "Goatee", "Mustache", "Clean-Shaven",],
+  "Facial Hair": ["Beard", "Goatee", "Mustache", "Clean-Shaven"],
 
   "Full-Body Garments": [
     "Jumpsuit",
@@ -239,8 +713,11 @@ const tagCategories = {
     "Athletic",
     "Casual",
     "Formal",
+    "Heavy Armored",
+    "Lightly Armored",
     "Luxury",
     "Medieval",
+    "Mildy Armored",
     "Poor",
     "Spandex",
     "Streetwear",
@@ -260,7 +737,8 @@ const tagCategories = {
     "Sandals",
     "Sneakers",
     "Socks",
-    "Strapped Boots"
+    "Strapped Boots",
+    "Velcro Sneakers",
   ],
 
   Sex: ["Female", "Male", "Unisex"],
@@ -270,8 +748,11 @@ const tagCategories = {
     "Boxing Gloves",
     "Clawed Gloves",
     "Clean Gloves",
+    "Elbow-Length Gloves",
     "Fingerless Gloves",
     "Leather Gloves",
+    "Long Gloves",
+    "Opera Gloves",
     "Mechanical Gloves",
     "Gloveless",
     "Rubber Gloves",
@@ -317,8 +798,10 @@ const tagCategories = {
     "Headphones",
     "Headband",
     "Helmet",
+    "Open-Top Helmet",
     "Hood",
     "Mask",
+    "Open-Top Mask",
     "Tiara",
     "Visor[Off]",
     "Visor Glasses[Off]",
@@ -338,20 +821,33 @@ const tagCategories = {
     "Skirts",
     "Short Skirts",
     "Skin Tight Pants",
+    "Leather Pants",
     "Long Skirts",
     "Sweat Pants",
     "Track Pants",
     "Underwear",
   ],
 
-  Region: ["African", "Asian", "Middle Eastern", "Norwegian", "European", "South American"],
+  Region: [
+    "African",
+    "Asian",
+    "Middle Eastern",
+    "Norwegian",
+    "European",
+    "South American",
+    "North American",
+  ],
 
-  Series: [
+  Rarity: [
     "Anime",
+    "Common",
     "DC",
+    "Epic",
     "Gaming Legends Series",
     "Icon Series",
+    "Legendary",
     "Marvel",
+    "Rare",
     "Star Wars",
     "TMNT",
   ],
@@ -372,13 +868,21 @@ const tagCategories = {
     "Horror",
     "Medieval",
     "Military",
-    "Modern",
     "Post-Apocalyptic",
     "Royalty",
     "School",
     "Space",
     "Steampunk",
     "Tactical",
+  ],
+
+  "Outfit Era": [
+    "1800's",
+    "1930's - 1960's",
+    "1970's",
+    "1980's",
+    "1990's",
+    "2000's",
   ],
 
   Tops: [
@@ -390,6 +894,7 @@ const tagCategories = {
     "Hoodie",
     "Jacket",
     "Long Sleeve",
+    "Leather Jacket",
     "Muscle Cuirass",
     "Puffy Jacket",
     "Scrunch Sleeve Jacket",
@@ -519,10 +1024,15 @@ const tagAliases = {
   // OUTFIT STYLE
   // =========================
 
+  "light armor": ["Lightly Armored"],
+  "Heavy armor": ["Heavy Armored"],
   armor: ["Armored"],
-  armour: ["Armored"],
 
-  sporty: ["Athletic"],
+ 
+
+
+
+  sporty: ["Sport"],
 
   business: ["Formal"],
 
@@ -815,7 +1325,7 @@ function parseSearchQuery(searchText) {
       const phrase = remainingWords.slice(start, end).join(" ");
 
       const possibleSkin = skins.find(
-        (skin) => skin.Identity.skin_name.toLowerCase() === phrase,
+        (skin) => skin.Identity?.skin_name?.toLowerCase() === phrase,
       );
 
       if (possibleSkin) {
@@ -830,6 +1340,8 @@ function parseSearchQuery(searchText) {
       }
     }
   }
+
+  
 
   // Remove blanks
   const cleanedNameWords = nameWords.filter(Boolean);
@@ -876,6 +1388,8 @@ Object.entries(tagCategories).forEach(([categoryName, tags]) => {
     category.classList.toggle("Open");
   });
 
+
+
   // CREATE TAGS
 
   tags.forEach((tag) => {
@@ -908,29 +1422,24 @@ Object.entries(tagCategories).forEach(([categoryName, tags]) => {
 });
 
 
-  const timeline = {
-    1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  let timeline = {};
+function buildTimelineFromCosmetics() {
+  const grouped = new Map();
+  skins.forEach(skin => {
+    if (skin.Chapter === null || skin.Chapter === undefined || skin.Chapter === "") return;
+    const chapter = String(skin.Chapter);
+    if (!grouped.has(chapter)) grouped.set(chapter, new Set());
+    if (skin.Season !== null && skin.Season !== undefined && skin.Season !== "")
+      grouped.get(chapter).add(String(skin.Season));
+  });
+  timeline = {};
+  [...grouped.entries()].sort((a,b) => Number(a[0]) - Number(b[0])).forEach(([chapter,seasons]) => {
+    timeline[chapter] = [...seasons].sort((a,b) => Number(a)-Number(b));
+  });
+}
 
-    2: [1, 2, 3, 4, 5, 6, 7, 8],
-
-    3: [1, 2, 3, 4],
-
-    4: [1, 2, 3, 4,"OG"],
-
-    5: [1, 2, 3, 4, ],
-
-    6: [1, 2, "Galactic Battle", 3, 4, "The Simpsons"],
-
-    7: [1,2,3],
-
-    "OG": [1, 2, 3, 4 ,5, 6 , 7 ,8, 9],
-
-    "Remix": []
-
-
-
-  };
 function createTimeline() {
+  buildTimelineFromCosmetics();
   timelineList.innerHTML = "";
 
   const chapterNames = {
@@ -978,6 +1487,7 @@ function createTimeline() {
       const button = document.createElement("div");
 
       button.classList.add("SeasonButton");
+      button.dataset.season = String(season);
 
       button.textContent = `Season ${season}`;
 
@@ -988,11 +1498,11 @@ function createTimeline() {
         const chapterValue = isNaN(chapter) ? chapter : Number(chapter);
 
         // Clicking the same season deselects it
-        if (selectedChapter === chapterValue && selectedSeason === season) {
+        if (selectedChapter === chapterValue && String(selectedSeason) === String(season)) {
           selectedSeason = null;
         } else {
           selectedChapter = chapterValue;
-          selectedSeason = season;
+          selectedSeason = String(season);
         }
 
         updateTimelineSelection();
@@ -1030,9 +1540,9 @@ function updateTimelineSelection() {
 
       if (selectedSeason !== null) {
         category.querySelectorAll(".SeasonButton").forEach((button) => {
-          const season = Number(button.textContent.replace("Season ", ""));
+          const season = button.dataset.season;
 
-          if (season === selectedSeason) {
+          if (String(season) === String(selectedSeason)) {
             button.classList.add("Active");
           }
         });
@@ -1047,91 +1557,120 @@ function updateTimelineSelection() {
 
 function openSkinOverlay(skin) {
   skinOverlay.style.display = "flex";
+  overlaySkinName.textContent = skin.Identity?.skin_name || "Unknown Outfit";
+  overlaySource.textContent = skin.Source || "Not provided by Fortnite-API";
+  overlayIntroduced.textContent = `${skin.Chapter ? `Chapter ${skin.Chapter}` : "Unknown chapter"} ${skin.Season ? `Season ${skin.Season}` : "Unknown season"}`;
+  overlayRarity.textContent = skin.Rarity || "Unknown";
+  overlayCodename.textContent = skin.Codename || "Unknown";
 
-  overlaySkinName.textContent = skin.Identity.skin_name;
-
-  overlaySource.textContent = skin.Source || "Unknown";
-
-  overlayIntroduced.textContent = `Chapter ${skin.Chapter} Season ${skin.Season}`;
-
-  overlayRarity.textContent = skin.Rarity || skin.rarity || "Unknown";
-
-  overlayCodename.textContent = skin.Codename || skin.codename || "Unknown";
-
-
-  overlayTags.innerHTML = "";
-
-  skin.Tags.forEach((tag) => {
+  overlayTags.replaceChildren();
+  (skin.Tags || []).forEach(tag => {
     const div = document.createElement("div");
-
     div.className = "OverlayTag";
-
     div.textContent = tag;
-
     overlayTags.appendChild(div);
   });
 
-  skinVideo.src =
-    skin.video ?? `https://fnggcdn.com/items/${skin.id}/video.mp4?2`;
-
-  skinVideo.play();
-}
-
-// =========================
-// DISPLAY SKINS
-// =========================
-
-function displaySkins(skinArray) {
-  skinHub.innerHTML = "";
-
-  if (skinArray.length === 0) {
-    skinHub.innerHTML = `
-      <p class="NoResults">
-        No matching skins found.
-      </p>
-    `;
-
-    return;
+  const apiInfo = document.getElementById("OverlayAPIInfo");
+  if (apiInfo) {
+    apiInfo.replaceChildren();
+    const api = skin.API || {};
+    const details = [
+      ["Fortnite API ID", api.id],
+      ["Type", api.type?.displayValue || api.type?.value],
+      ["Rarity", api.displayRarity || api.rarity?.displayValue],
+      ["Set", api.set?.text || api.set?.value],
+      ["Series", api.series?.value || api.series?.name],
+      ["Added", api.added],
+      ["Last Updated", api.lastUpdate],
+      ["Gameplay Tags", Array.isArray(api.gameplayTags) ? api.gameplayTags.join(", ") : null]
+    ];
+    details.forEach(([label,value]) => {
+      if (value === undefined || value === null || value === "") return;
+      const row = document.createElement("div");
+      row.className = "InfoRow";
+      const title = document.createElement("span");
+      title.className = "InfoLabel";
+      title.textContent = `${label}: `;
+      const content = document.createElement("span");
+      content.textContent = String(value);
+      row.append(title,content);
+      apiInfo.appendChild(row);
+    });
+    const raw = document.createElement("details");
+    const summary = document.createElement("summary");
+    summary.textContent = "View complete Fortnite API data";
+    const pre = document.createElement("pre");
+    pre.textContent = JSON.stringify(api,null,2);
+    raw.append(summary,pre);
+    apiInfo.appendChild(raw);
   }
 
-  skinArray.forEach((skin) => {
-    const imageURL = skin.isEditStyle
-    ? skin.icon
-    : `./Images/Skins/${skin.id}.jpg`;
-
-    const tagHTML = showTags
-    ? skin.Tags.map(tag => `
-        <span class="CardTag">
-            ${tag}
-        </span>
-    `).join("")
-    : "";
-
-    skinHub.innerHTML += `
-
-      <div
-        class="SkinCard"
-        onclick="openSkinOverlay(skins[${skins.indexOf(skin)}])"
-      >
-
-        <h3 class="SkinName">
-          ${skin.Identity.skin_name}
-        </h3>
-
-        <img src="${imageURL}" />
-
-        ${showTags ? `
-        <div class="CardTags">
-            ${tagHTML}
-        </div>
-        ` : ""}
-
-      </div>
-
-    `;
-  });
+  skinVideo.pause();
+  skinVideo.src = skin.video || "";
+  const videoContainer = skinVideo.closest(".OverlayVideo");
+  if (videoContainer) videoContainer.style.display = skin.video ? "block" : "none";
+  if (skin.video) skinVideo.play().catch(() => {});
 }
 
+function displaySkins(skinArray) {
+  skinHub.replaceChildren();
+  if (!skinArray.length) {
+    const empty = document.createElement("p");
+    empty.className = "NoResults";
+    empty.textContent = "No matching skins found.";
+    skinHub.appendChild(empty);
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  skinArray.forEach(skin => {
+    const card = document.createElement("div");
+    card.className = "SkinCard";
+    card.addEventListener("click", () => openSkinOverlay(skin));
+    const name = document.createElement("h3");
+    name.className = "SkinName";
+    name.textContent = skin.Identity?.skin_name || "Unknown Outfit";
+    const image = document.createElement("img");
+    image.src = skin.icon || "";
+    image.alt = skin.Identity?.skin_name || "Fortnite outfit";
+    image.loading = "lazy";
+    image.onerror = () => { image.alt = "Image unavailable"; };
+
+    // Hover video preview (Fortnite.GG CDN); click still opens the full skin overlay.
+    if (skin.video) {
+      const preview = document.createElement("video");
+      preview.className = "SkinHoverVideo";
+      preview.src = skin.video;
+      preview.muted = true;
+      preview.loop = true;
+      preview.playsInline = true;
+      preview.preload = "none";
+      card.addEventListener("mouseenter", () => {
+        preview.play().catch(() => {});
+      });
+      card.addEventListener("mouseleave", () => {
+        preview.pause();
+        try { preview.currentTime = 0; } catch (_) {}
+      });
+      card.append(name,image,preview);
+    } else {
+      card.append(name,image);
+    }
+    if (showTags && (skin.Tags || []).length) {
+      const tags = document.createElement("div");
+      tags.className = "CardTags";
+      skin.Tags.forEach(tag => {
+        const el = document.createElement("span");
+        el.className = "CardTag";
+        el.textContent = tag;
+        tags.appendChild(el);
+      });
+      card.appendChild(tags);
+    }
+    fragment.appendChild(card);
+  });
+  skinHub.appendChild(fragment);
+}
 
 
 // =========================
@@ -1147,8 +1686,9 @@ function filterSystem() {
 
   const filteredSkins = skins.filter((skin) => {
     const searchableName = [
-      skin.Identity.skin_name,
-
+      skin.Identity?.skin_name,
+      skin.id,
+      skin.Rarity,
       ...(skin.SearchableTerms || []),
     ]
       .join(" ")
@@ -1161,10 +1701,14 @@ function filterSystem() {
 
      
 
-    const manualTagsMatch = activeTags.every((tag) => skin.Tags.includes(tag));
+    const manualTagsMatch = activeTags.length === 0 || (
+      manualTagMatchMode === "any"
+        ? activeTags.some((tag) => (skin.Tags || []).includes(tag))
+        : activeTags.every((tag) => (skin.Tags || []).includes(tag))
+    );
 
     const searchTagsMatch = parsedSearch.extractedTags.every((tag) =>
-      skin.Tags.includes(tag),
+      (skin.Tags || []).includes(tag),
     );
 
     const tagMatch = manualTagsMatch && searchTagsMatch;
@@ -1172,16 +1716,26 @@ function filterSystem() {
     let chapterMatch = true;
 
     if (selectedChapter !== null) {
+      const skinChapter = Number(skin.Chapter);
+      const selectedChapterNumber = Number(selectedChapter);
+
       if (chapterFilterMode === "exact") {
-        chapterMatch = skin.Chapter === selectedChapter;
+        chapterMatch = String(skin.Chapter) === String(selectedChapter) ||
+          (Number.isFinite(skinChapter) && skinChapter === selectedChapterNumber);
       } else if (chapterFilterMode === "above") {
-        chapterMatch = skin.Chapter >= selectedChapter;
+        chapterMatch = Number.isFinite(skinChapter) &&
+          Number.isFinite(selectedChapterNumber) &&
+          skinChapter >= selectedChapterNumber;
       } else if (chapterFilterMode === "below") {
-        chapterMatch = skin.Chapter <= selectedChapter;
+        chapterMatch = Number.isFinite(skinChapter) &&
+          Number.isFinite(selectedChapterNumber) &&
+          skinChapter <= selectedChapterNumber;
       }
     }
+
     const seasonMatch =
-      selectedSeason === null || skin.Season === selectedSeason;
+      selectedSeason === null ||
+      String(skin.Season) === String(selectedSeason);
 
     return nameMatch && tagMatch && chapterMatch && seasonMatch;
   });
@@ -1216,18 +1770,25 @@ skinOverlay.addEventListener("click", (event) => {
 // INITIAL LOAD
 
 // =========================
-createTimeline();
-displaySkins(skins);
+displaySkins([]);
+loadFortniteCosmetics();
 
 const enterButton = document.getElementById("EnterButton");
 const startScreen = document.getElementById("StartScreen");
 const music = document.getElementById("BackgroundMusic");
 
 function enterWebsite() {
-  music.volume = 0.35;
+  // Audio is optional: a missing file or browser autoplay restriction must not
+  // prevent the user from entering the website.
+  if (music) {
+    music.volume = 0.35;
+    const playback = music.play();
+    if (playback && typeof playback.catch === "function") {
+      playback.catch(error => console.warn("Background music could not play:", error));
+    }
+  }
 
-  music.play();
-
+  if (!startScreen) return;
   startScreen.classList.add("Hidden");
 
   setTimeout(() => {

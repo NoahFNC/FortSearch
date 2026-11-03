@@ -2,7 +2,7 @@
 // DATABASE
 // =========================
 
-const skins = [
+const skinMetadata = [
   {
     id: "8086",
 
@@ -15,15 +15,11 @@ const skins = [
     Codename: "M_PennantSeasOne_C",
     Rarity: "Rare",
 
-    Identity: {
-      skin_name: "'Mato Marauder",
-    },
-
     Tags: [
       "Young",
       "Non Cell Shaded",
       "Human",
-      "Average",
+      "Muscular",
       "Civilian",
       "Clean-Shaven",
       "Athletic",
@@ -35,6 +31,7 @@ const skins = [
       "Cuffed Pants",
       "Medium 👍🏽👊🏽",
       "Modern",
+      "Jacket",
       "Tracksuit Jacket",
     ],
   },
@@ -48,9 +45,6 @@ const skins = [
     Chapter: "Remix",
     Season: "",
 
-    Identity: {
-      skin_name: "1-Ball",
-    },
 
     Tags: [
       "Young",
@@ -60,10 +54,11 @@ const skins = [
       "Knee Pads",
       "Shoulder Pads",
       "Human",
-      "Average",
-      "Ninja",
+      "Muscular",
+      "Agent",
       "Unitard",
       "Armored",
+      "Mildy Armored",
       "Strapped Boots",
       "Male",
       "Armored Gloves",
@@ -78,11 +73,10 @@ const skins = [
 
     isEditStyle: true,
 
-    icon: "Images/Skins/T_Soldier_StageCue_ChalkJacket.png",
+    icon: "Images\\Skins\\T_Soldier_StageCue_ChalkJacket.png",
     video: "https://fnggcdn.com/items/15288/video-1-2-1.mp4?2",
 
-    Chapter: "Remix",
-    Season: "",
+   
 
     Identity: {
       skin_name: "1-Ball[Jacket]",
@@ -93,8 +87,8 @@ const skins = [
       "Non Cell Shaded",
       "Knee Pads",
       "Human",
-      "Average",
-      "Ninja",
+      "Muscular",
+      "Agent",
       "Unitard",
       "Strapped Boots",
       "Male",
@@ -102,6 +96,7 @@ const skins = [
       "Tactical Gloves",
       "Helmet",
       "Tactical",
+      "Jacket",
       "Puffy Jacket",
     ],
   },
@@ -112,14 +107,8 @@ const skins = [
     isEditStyle: false,
     icon: undefined,
     video: undefined,
-    Chapter: "Remix",
-    Season: "",
 
-    Identity: {
-      skin_name: "10-Ball",
-      rarity: "Epic",
-    },
-
+    
     Tags: [
       "Ammo Pouch",
       "Young",
@@ -132,9 +121,10 @@ const skins = [
       "Military Belt",
       "Human",
       "Average",
-      "Ninja",
+      "Agent",
       "Unitard",
       "Armored",
+      "Mildy Armored",
       "High Military Boots",
       "Female",
       "Clean Gloves",
@@ -144,12 +134,154 @@ const skins = [
       "Tactical",
     ],
   },
+
+  {
+    id: "19251",
+
+    isEditStyle: false,
+    icon: undefined,
+    video: undefined,
+    Rarity: "Epic",
+    Source: "Item Shop",
+
+    Identity: {
+    },
+
+    Tags: [
+      "Ammo Pouch",
+      "Pouches",
+      "Non Cell Shaded",
+      "Armguard",
+      "Knee-Shin Guards",
+      "Shin Guards",
+      "Human",
+      "Muscular",
+      "Agent",
+      "Armored",
+      "Lightly Armored",
+      "Sneakers",
+      "Velcro Sneakers",
+      "Male",
+      "Tactical Gloves",
+      "Epic",
+      "Tactical",
+      "Jacket",
+      "Cropped Jacket",
+      "Puffy Jacket",
+      "Sleeveless",
+      "Sleeveless Jacket",
+
+    ],
+  },
+
+  
+
+
+  //Marvel Rarity//
+
+  {
+    id: 543,
+
+    isEditStyle: false,
+    icon: undefined,
+    video: undefined,
+    Chapter: 1,
+    Season: 8,
+    Source: "Item Shop",
+    Codename: "F_AshtonBoardwalk",
+    Rarity: "Marvel",
+
+    Identity: {
+      skin_name: "Black Widow Outfit",
+      rarity: "Marvel",
+    },
+
+    Tags: [
+      "Armband",
+      "Bracelet",
+      "Holster",
+      "Storm Tracker",
+      "Young-Adult",
+      "Non Cell Shaded",
+      "Shin Guards",
+      "Knee Pads",
+      "Military Belt",
+      "Tactical Belt",
+      "Human",
+      "Average",
+      "Assassin",
+      "Superhero",
+      "Clean-Shaven",
+      "Unitard",
+      "Strapped Boots",
+      "Armored Boots",
+      "Female",
+      "Fingerless Gloves",
+      "Tactical Gloves",
+      "Short Hair",
+      "Wavy Hair",
+      "European",
+      "Marvel",
+      "Medium Light 👍🏼👊🏼",
+      "Tactical",
+      "Firearm",
+      "Pistol",
+    ],
+  },
+
+  {
+    id: 542,
+
+    isEditStyle: false,
+    icon: undefined,
+    video: undefined,
+    Chapter: "1",
+    Season: "8",
+    Source: "Item Shop",
+    Codename: "M_AshtonSaltLake",
+    Rarity: "Marvel",
+
+    Identity: {
+      skin_name: "Star-Lord Outfit",
+      rarity: "Marvel",
+    },
+
+    Tags: [
+      "Armband",
+      "Storm Tracker",
+      "Walkman",
+      "Headphones",
+      "Pouches",
+      "Respirator",
+      "Young-Adult",
+      "Non Cell Shaded",
+      "Knee Pads",
+      "Tactical Belt",
+      "Human",
+      "Average",
+      "Superhero",
+      "Military Boots",
+      "Male",
+      "Leather Gloves",
+      "Mohawk",
+      "Helmet",
+      "Open-Top Helmet",
+      "Leather Pants",
+      "Marvel",
+      "Medium Light 👍🏼👊🏼",
+      "Tactical",
+      "Space",
+      "Jacket",
+      "Leather Jacket",
+      "Sleeveless Jacket",
+    ],
+  },
 ];
 
 if (typeof module !== "undefined") {
-  module.exports = skins;
+  module.exports = skinMetadata;
 }
 
 if (typeof window !== "undefined") {
-  window.skins = skins;
+  window.skinMetadata = skinMetadata;
 }

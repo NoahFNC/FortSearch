@@ -43,7 +43,7 @@
         <!-- Creative Corp Splash -->
 
         <div id="CreativeCorpSplash" class="CreativeCorpSplash">
-          <img src="Images/Creative Corp Logo 2026.png" class="StartLogo" />
+          <img src="Images/Creative Corp Logo 2027.png" class="StartLogo" />
 
           <h2 class="PoweredText">Powered by Creative Corp</h2>
         </div>
@@ -97,7 +97,7 @@
       </div>
 
       <div class="SponserTag">
-        <img src="Images/Creative Corp Logo 2026.png" class="CCLogo" />
+        <img src="Images/Creative Corp Logo 2027.png" class="CCLogo" />
 
         <p>By Creative Corp</p>
       </div>
@@ -119,6 +119,14 @@
 
         <div class="TagPanel">
           <h2 class="PanelTitle">Tags</h2>
+
+          <div class="TagMatchModeControl">
+            <label for="TagMatchMode">Selected tag matching</label>
+            <select id="TagMatchMode" aria-label="How selected tag filters should match">
+              <option value="all" selected>Match all selected tags</option>
+              <option value="any">Match at least one selected tag</option>
+            </select>
+          </div>
 
           <div class="TagList" id="TagList"></div>
         </div>

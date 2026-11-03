@@ -1521,3 +1521,623 @@ opacity:.2;
   font-size: 14px;
 
 }
+
+/* Selected tag matching mode */
+.TagMatchModeControl {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+.TagMatchModeControl label {
+  color: rgba(255,255,255,.72);
+  font: 700 12px Arial, sans-serif;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.TagMatchModeControl select {
+  width: 100%;
+  padding: 11px 13px;
+  color: white;
+  background: #1e1e24;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 10px;
+  font: 600 14px Arial, sans-serif;
+  outline: none;
+}
+.TagMatchModeControl select:focus {
+  border-color: rgba(255,255,255,.5);
+}
+
+.SkinCardMedia {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.SkinCardMedia > img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.SkinHoverVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.SkinCard:hover .SkinHoverVideo {
+    opacity: 1;
+}
+
+
+
+/* =========================================================
+   CREATIVE CORP 2027 — FORTSEARCH VISUAL REFRESH
+   Styling overrides only; existing layout and functionality
+   are intentionally preserved.
+   ========================================================= */
+
+:root {
+    --cc-cyan: #00e7d0;
+    --cc-blue: #075bff;
+    --cc-green: #00f044;
+    --cc-purple: #8500ff;
+    --cc-magenta: #f000d8;
+    --cc-red: #ff173d;
+    --cc-surface: #101116;
+    --cc-surface-raised: #171920;
+    --cc-border: rgba(255,255,255,.075);
+    --cc-muted: #a7a9b5;
+    --cc-gradient-primary: linear-gradient(115deg, #00e7d0 0%, #075bff 42%, #00f044 100%);
+    --cc-gradient-secondary: linear-gradient(115deg, #8500ff 0%, #f000d8 52%, #ff173d 100%);
+    --cc-gradient-full: linear-gradient(115deg, #00e7d0 0%, #075bff 27%, #8500ff 53%, #f000d8 76%, #ff173d 100%);
+}
+
+html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+}
+
+body {
+    background:
+        radial-gradient(ellipse at 12% 8%, rgba(0, 231, 208, .075), transparent 34%),
+        radial-gradient(ellipse at 88% 18%, rgba(133, 0, 255, .075), transparent 34%),
+        radial-gradient(ellipse at 50% 100%, rgba(7, 91, 255, .07), transparent 42%),
+        #07080b;
+    background-size: auto;
+    animation: none;
+}
+
+body::before {
+    background:
+        radial-gradient(circle at 12% 18%, rgba(0, 231, 208, .055), transparent 30%),
+        radial-gradient(circle at 86% 28%, rgba(240, 0, 216, .045), transparent 30%),
+        radial-gradient(circle at 48% 92%, rgba(7, 91, 255, .06), transparent 34%);
+    animation: none;
+}
+
+.Header {
+    background: rgba(17, 18, 24, .88);
+    border: 1px solid var(--cc-border);
+    border-radius: 16px;
+    box-shadow: 0 12px 36px rgba(0,0,0,.38), inset 0 1px rgba(255,255,255,.035);
+    backdrop-filter: blur(18px);
+}
+
+.PageTitle h1 {
+    letter-spacing: 1px;
+    background: var(--cc-gradient-full);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 16px rgba(0, 160, 255, .12));
+}
+
+.SponserTag {
+    color: #c5c7d0;
+}
+
+.CCLogo {
+    filter: drop-shadow(0 0 8px rgba(0, 231, 208, .18));
+}
+
+.TopSection {
+    gap: 24px;
+}
+
+.TimelinePanel,
+.TagPanel,
+.WelcomePanel,
+.SkinHubContainer {
+    background: linear-gradient(145deg, rgba(22,24,31,.97), rgba(12,13,18,.98));
+    border: 1px solid var(--cc-border);
+    box-shadow: 0 16px 42px rgba(0,0,0,.38), inset 0 1px rgba(255,255,255,.035);
+    border-radius: 20px;
+}
+
+.TimelinePanel::before,
+.TagPanel::before,
+.WelcomePanel::before,
+.SkinHubContainer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 8%;
+    right: 8%;
+    height: 2px;
+    background: var(--cc-gradient-full);
+    opacity: .72;
+    border-radius: 0 0 99px 99px;
+}
+
+.PanelTitle,
+.HubTitle {
+    letter-spacing: .5px;
+}
+
+.PanelTitle::after,
+.HubTitle::after {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 3px;
+    margin-top: 9px;
+    border-radius: 99px;
+    background: var(--cc-gradient-primary);
+}
+
+#SearchBar {
+    background: rgba(17,19,26,.96);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 5px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.2);
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+#SearchBar:focus {
+    border-color: rgba(0, 200, 255, .65);
+    box-shadow: 0 0 0 3px rgba(0, 160, 255, .10), 0 0 24px rgba(0, 160, 255, .10);
+}
+
+#SearchBar::placeholder {
+    color: #777d8c;
+}
+
+.AISearchButton {
+    background: #20232d;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+}
+
+.AISearchButton:hover,
+.AISearchButton.Active {
+    background: var(--cc-gradient-primary);
+    color: #05080d;
+    box-shadow: 0 0 22px rgba(0, 190, 210, .18);
+}
+
+.AISearchPanel {
+    background: rgba(18,20,28,.86);
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 14px;
+}
+
+.AISearchTitle {
+    color: var(--cc-cyan);
+}
+
+.TagMatchModeControl select,
+#ChapterFilterMode {
+    background: #171a22;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 11px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.TagMatchModeControl select:focus,
+#ChapterFilterMode:focus {
+    border-color: rgba(0, 231, 208, .65);
+    box-shadow: 0 0 0 3px rgba(0, 231, 208, .09);
+    outline: none;
+}
+
+.FilterTag {
+    background: #20232c;
+    border: 1px solid rgba(255,255,255,.055);
+    color: #e6e8ef;
+    border-radius: 9px;
+    transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.FilterTag:hover {
+    background: #2a2e39;
+    border-color: rgba(0, 231, 208, .35);
+    transform: translateY(-2px);
+}
+
+.FilterTag.Active {
+    background: var(--cc-gradient-primary);
+    border-color: transparent;
+    color: #05080d;
+    box-shadow: 0 0 18px rgba(0, 190, 210, .16);
+}
+
+.TimelineHeader,
+.SeasonButton {
+    background: #191c25;
+    border: 1px solid rgba(255,255,255,.045);
+    border-radius: 11px;
+    transition: background .2s ease, transform .2s ease, border-color .2s ease;
+}
+
+.TimelineHeader:hover,
+.SeasonButton:hover {
+    background: #252a36;
+    border-color: rgba(0, 231, 208, .25);
+}
+
+.TimelineHeader.Active,
+.SeasonButton.Active {
+    background: var(--cc-gradient-primary);
+    color: #05080d;
+    box-shadow: 0 0 18px rgba(0, 190, 210, .16);
+}
+
+.SeasonButton {
+    font-size: 16px;
+}
+
+.SkinHubContainer {
+    background: linear-gradient(145deg, rgba(19,21,28,.98), rgba(10,11,16,.98));
+}
+
+.SkinCard {
+    position: relative;
+    background: #111319;
+    border: 1px solid rgba(255,255,255,.065);
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+    transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+.SkinCard:hover {
+    transform: translateY(-5px) scale(1.025);
+    border-color: rgba(0, 210, 230, .42);
+    box-shadow: 0 12px 34px rgba(0,0,0,.42), 0 0 22px rgba(0,130,255,.12);
+}
+
+.SkinName {
+    color: #f4f5fa;
+    font-weight: 800;
+    letter-spacing: .15px;
+}
+
+.CardTag {
+    background: #222631;
+    border: 1px solid rgba(255,255,255,.045);
+    color: #cbd0dc;
+    border-radius: 7px;
+}
+
+.Slider {
+    background: #353a48;
+}
+
+.TagToggle input:checked + .Slider {
+    background: var(--cc-gradient-primary);
+    box-shadow: 0 0 16px rgba(0, 190, 210, .18);
+}
+
+.SkinOverlay {
+    background: rgba(3,4,8,.88);
+    backdrop-filter: blur(14px);
+}
+
+.OverlayContent {
+    background: linear-gradient(145deg, #191b24, #0d0f15);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 22px;
+    box-shadow: 0 24px 80px rgba(0,0,0,.65), 0 0 35px rgba(90,0,255,.08);
+}
+
+#OverlaySkinName {
+    background: var(--cc-gradient-full);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.InfoLabel {
+    color: #dce0ea;
+}
+
+.InfoValue {
+    color: #aeb5c5;
+}
+
+.OverlayTag {
+    background: linear-gradient(110deg, rgba(0,231,208,.18), rgba(7,91,255,.22), rgba(133,0,255,.18));
+    border: 1px solid rgba(0,200,255,.2);
+    color: #f3f5ff;
+}
+
+.CloseButton {
+    background: #252936;
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.CloseButton:hover {
+    background: var(--cc-gradient-secondary);
+    color: white;
+}
+
+.StartScreen {
+    background:
+        radial-gradient(ellipse at 18% 24%, rgba(0,231,208,.22), transparent 32%),
+        radial-gradient(ellipse at 82% 28%, rgba(0,240,68,.15), transparent 30%),
+        radial-gradient(ellipse at 76% 78%, rgba(240,0,216,.18), transparent 34%),
+        radial-gradient(ellipse at 22% 82%, rgba(7,91,255,.20), transparent 35%),
+        #050609;
+    background-size: auto;
+    animation: none;
+}
+
+.StartLogo {
+    filter: drop-shadow(0 0 18px rgba(0, 160, 255, .18)) drop-shadow(0 0 30px rgba(180, 0, 255, .12));
+}
+
+.PoweredText {
+    color: #d9dce6;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.IntroTitle {
+    background: var(--cc-gradient-full);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 0 22px rgba(0, 160, 255, .12));
+}
+
+.IntroSubtitle {
+    color: #f0f2f8;
+}
+
+.IntroDescription,
+.EnterHint {
+    color: #aeb4c3;
+}
+
+.EnterButton {
+    background: var(--cc-gradient-full);
+    color: #050609;
+    border-radius: 11px;
+    box-shadow: 0 8px 28px rgba(0,120,255,.18), 0 0 28px rgba(190,0,255,.10);
+    animation: none;
+    font-weight: 900;
+    letter-spacing: .6px;
+}
+
+.EnterButton:hover {
+    box-shadow: 0 10px 34px rgba(0,190,210,.22), 0 0 35px rgba(220,0,180,.16);
+}
+
+.ParticleContainer::before {
+    box-shadow:
+        10vw 15vh #00e7d0,
+        25vw 80vh #ffffff,
+        40vw 30vh #075bff,
+        60vw 70vh #f000d8,
+        75vw 20vh #00f044,
+        90vw 60vh #ffffff,
+        35vw 55vh #8500ff,
+        55vw 10vh #ffffff,
+        80vw 90vh #00e7d0,
+        15vw 50vh #ff173d,
+        65vw 40vh #075bff,
+        45vw 85vh #ffffff;
+}
+
+#MusicButton {
+    color: #e9edf7;
+    background: rgba(20,22,30,.82);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    padding: 8px 11px;
+}
+
+#MusicButton:hover {
+    border-color: rgba(0,231,208,.45);
+    box-shadow: 0 0 18px rgba(0,231,208,.12);
+}
+
+.VersionWebsite,
+.VersionIntro {
+    color: rgba(225,230,242,.62);
+}
+
+.TagPanel::-webkit-scrollbar,
+.TimelineList::-webkit-scrollbar {
+    width: 7px;
+}
+
+.TagPanel::-webkit-scrollbar-thumb,
+.TimelineList::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00cdbb, #075bff, #8500ff);
+    border-radius: 99px;
+}
+
+@media (max-width: 1050px) {
+    .TopSection {
+        width: 94%;
+        flex-wrap: wrap;
+    }
+
+    .LeftPanels {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .TagPanel,
+    .TimelinePanel {
+        box-sizing: border-box;
+        flex: 1 1 300px;
+        width: auto;
+    }
+
+    .SearchWelcomeArea {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .WelcomePanel {
+        box-sizing: border-box;
+        width: 100%;
+    }
+}
+
+@media (max-width: 650px) {
+    .Header {
+        width: calc(100% - 32px);
+        box-sizing: border-box;
+        gap: 12px;
+        padding: 10px 14px;
+    }
+
+    .PageTitle h1 {
+        font-size: 34px;
+    }
+
+    .SponserTag {
+        gap: 6px;
+        font-size: 12px;
+    }
+
+    .CCLogo {
+        width: 30px;
+        height: 30px;
+    }
+
+    .TopSection {
+        margin-top: 22px;
+        gap: 16px;
+    }
+
+    .LeftPanels {
+        flex-direction: column;
+    }
+
+    .TagPanel,
+    .TimelinePanel {
+        width: 100%;
+        flex: none;
+        padding: 20px;
+    }
+
+    .SearchBarRow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .AISearchButton {
+        width: 100%;
+        height: 44px;
+    }
+
+    .SkinHubContainer {
+        width: calc(100% - 32px);
+        box-sizing: border-box;
+        padding: 18px;
+        margin-top: 24px;
+    }
+
+    .SkinHub {
+        justify-content: center;
+        gap: 14px;
+    }
+
+    .SkinCard {
+        width: min(100%, 250px);
+    }
+
+    .HubHeader {
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .IntroTitle {
+        font-size: clamp(42px, 12vw, 72px);
+    }
+
+    .IntroDescription,
+    .IntroSubtitle {
+        font-size: 18px;
+    }
+
+    .StartLogo {
+        width: min(42vw, 180px);
+    }
+
+    .OverlayContent {
+        flex-direction: column;
+        gap: 18px;
+        overflow-y: auto;
+        max-height: 88vh;
+        padding: 20px;
+    }
+
+    .OverlayVideo,
+    .OverlayInfo {
+        width: 100%;
+        flex: none;
+    }
+
+    #OverlaySkinName {
+        font-size: 26px;
+    }
+
+    .InfoLabel {
+        font-size: 25px;
+    }
+}
+/* Keep intro background effects behind the content */
+.IntroBackground {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.GradientOverlay,
+.ParticleContainer,
+.Vignette {
+    pointer-events: none;
+}
+
+.StartContent {
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.FortSearchIntro,
+#EnterButton {
+    position: relative;
+    z-index: 3;
+    pointer-events: auto;
+}
+
+#EnterButton {
+    cursor: pointer;
+}
