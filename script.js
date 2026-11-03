@@ -197,10 +197,19 @@ async function loadFortniteIdCrossReference() {
 let skins = [];
 let cosmeticsLoaded = false;
 
+
 function normalizeCosmeticName(value) {
   return String(value || "").toLowerCase().replace(/['’]/g, "")
     .replace(/[^a-z0-9]+/g, " ").trim();
 }
+
+// Removes Fortnite codename prefixes for display.
+function formatCodename(codename) {
+  if (!codename) return "Unknown";
+
+  return String(codename).replace(/^(Character_|F_|M_)/i, "");
+}
+
 
 function getIntroductionPart(value) {
   if (value === undefined || value === null || value === "") return null;
@@ -1556,7 +1565,7 @@ function openSkinOverlay(skin) {
   overlaySource.textContent = skin.Source || "Not provided by Fortnite-API";
   overlayIntroduced.textContent = `${skin.Chapter ? `Chapter ${skin.Chapter}` : "Unknown chapter"} ${skin.Season ? `Season ${skin.Season}` : "Unknown season"}`;
   overlayRarity.textContent = skin.Rarity || "Unknown";
-  overlayCodename.textContent = skin.Codename || "Unknown";
+  overlayCodename.textContent = formatCodename(skin.Codename);
 
   overlayTags.replaceChildren();
   (skin.Tags || []).forEach(tag => {
