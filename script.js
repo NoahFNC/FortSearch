@@ -207,7 +207,7 @@ function normalizeCosmeticName(value) {
 function formatCodename(codename) {
   if (!codename) return "Unknown";
 
-  return String(codename).replace(/^(Character_|F_|M_)/i, "");
+  return String(codename).replace(/^.*?(?:Character_|F_|M_)/i, "");
 }
 
 
