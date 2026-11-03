@@ -10,6 +10,7 @@ const fortSearchMetadata = window.skinMetadata || [];
 // ============================================================
 
 let metadataByApiId = new Map();
+let fortniteGgIdByApiId = new Map();
 
 function parseCSV(csvText) {
   const rows = [];
@@ -76,16 +77,15 @@ async function loadFortniteIdCrossReference() {
       header.trim().toLowerCase()
     );
 
-    const nameIndex = headers.indexOf("skin name");
     const apiIdIndex = headers.indexOf("fortnite api id");
     const ggIdIndex = headers.indexOf("fortnite.gg id");
     const typeIndex = headers.indexOf("type");
 
-    if ([nameIndex, apiIdIndex, ggIdIndex, typeIndex].includes(-1)) {
+    if ([apiIdIndex, ggIdIndex, typeIndex].includes(-1)) {
       throw new Error("One or more required CSV columns are missing.");
     }
 
-    // First, index data.js entries by their original GG numeric ID.
+    // Index manually curated data.js entries by Fortnite.GG ID.
     const metadataByGgId = new Map();
 
     for (const metadata of fortSearchMetadata) {
@@ -102,17 +102,22 @@ async function loadFortniteIdCrossReference() {
       }
     }
 
+    // Separate maps:
+    // 1. Every CSV outfit gets an API ID -> GG ID mapping.
+    // 2. Only manually curated outfits get metadata mappings.
+    const newGgIdByApiId = new Map();
     const newMetadataByApiId = new Map();
+
     const ambiguousIds = new Set();
 
     let outfitRows = 0;
-    let matchedRows = 0;
+    let mappedRows = 0;
+    let curatedMatches = 0;
     let unmatchedRows = 0;
 
     for (const row of rows.slice(1)) {
       const type = row[typeIndex]?.trim().toLowerCase();
 
-      // Only process outfits.
       if (type !== "outfit") continue;
 
       outfitRows++;
@@ -125,65 +130,64 @@ async function loadFortniteIdCrossReference() {
         continue;
       }
 
-      const metadata = metadataByGgId.get(ggId);
+      // Map every valid outfit, even if it isn't in data.js.
+      if (newGgIdByApiId.has(apiId)) {
+        const existingGgId = newGgIdByApiId.get(apiId);
 
-      if (!metadata) {
-        unmatchedRows++;
-        continue;
-      }
-
-      // Detect conflicting API IDs instead of silently choosing one.
-      if (newMetadataByApiId.has(apiId)) {
-        const existing = newMetadataByApiId.get(apiId);
-
-        if (existing !== metadata) {
-          newMetadataByApiId.delete(apiId);
+        if (existingGgId !== ggId) {
+          newGgIdByApiId.delete(apiId);
           ambiguousIds.add(apiId);
           console.warn("Ambiguous Fortnite API ID:", apiId);
         }
-
-        continue;
+      } else if (!ambiguousIds.has(apiId)) {
+        newGgIdByApiId.set(apiId, ggId);
       }
 
-      if (ambiguousIds.has(apiId)) continue;
+      // Preserve curated metadata when a data.js entry exists.
+      const metadata = metadataByGgId.get(ggId);
 
-      // Preserve the original Fortnite.GG ID.
-      metadata.fortniteGgId = metadata.fortniteGgId ?? metadata.id;
+      if (metadata) {
+        metadata.fortniteGgId =
+          metadata.fortniteGgId ?? metadata.id;
 
-      newMetadataByApiId.set(apiId, metadata);
-      matchedRows++;
+        if (!newMetadataByApiId.has(apiId)) {
+          newMetadataByApiId.set(apiId, metadata);
+        }
+
+        curatedMatches++;
+      } else {
+        unmatchedRows++;
+      }
     }
 
-    // Do not allow ambiguous IDs to be used.
+    // Remove ambiguous API IDs from both maps.
     for (const apiId of ambiguousIds) {
+      newGgIdByApiId.delete(apiId);
       newMetadataByApiId.delete(apiId);
     }
 
+    // Activate the new maps.
+    fortniteGgIdByApiId = newGgIdByApiId;
     metadataByApiId = newMetadataByApiId;
 
     console.log("Fortnite.GG cross-reference loaded!");
-    console.log("Outfit rows:", outfitRows);
-    console.log("Matched data.js entries:", matchedRows);
-    console.log("Unmatched rows:", unmatchedRows);
+    console.log("CSV outfit rows:", outfitRows);
+    console.log("Total API -> GG ID mappings:", fortniteGgIdByApiId.size);
+    console.log("Curated data.js matches:", curatedMatches);
+    console.log("Rows without curated metadata:", unmatchedRows);
     console.log("Ambiguous API IDs:", ambiguousIds.size);
-    console.log("Usable API ID mappings:", metadataByApiId.size);
+
+    console.log(
+      "First 10 API -> GG mappings:",
+      [...fortniteGgIdByApiId.entries()].slice(0, 10)
+    );
 
   } catch (error) {
     console.error("Failed to load Fortnite.GG cross-reference:", error);
+
     metadataByApiId = new Map();
+    fortniteGgIdByApiId = new Map();
   }
-
-  console.log("Cross-reference map size:", metadataByApiId.size);
-
-  console.log(
-    "First 10 mapped API IDs:",
-    [...metadataByApiId.keys()].slice(0, 10)
-  );
-
-  console.log(
-    "Test API ID:",
-    metadataByApiId.has("CID_A_333_Athena_Commando_M_Solstice_C1YP3")
-  );
 }
 
 
@@ -210,18 +214,10 @@ function getIntroductionPart(value) {
 
 function mergeApiCosmetic(apiCosmetic) {
   const apiName = apiCosmetic.name || "Unknown Outfit";
-
-  // Match using the Fortnite API ID.
   const metadata = metadataByApiId.get(apiCosmetic.id) || null;
-
-  console.log("Skin:", apiCosmetic.name);
-  console.log("API ID:", apiCosmetic.id);
-  console.log("Metadata found:", !!metadata);
-  console.log("Matched metadata:", metadata);
-  console.log("Tags:", metadata?.Tags);
-
   const intro = apiCosmetic.introduction || {};
 
+  // Preserve the original Fortnite.GG ID in curated metadata.
   if (metadata) {
     metadata.fortniteGgId =
       metadata.fortniteGgId ?? metadata.id ?? null;
@@ -229,7 +225,16 @@ function mergeApiCosmetic(apiCosmetic) {
     metadata.id = apiCosmetic.id;
   }
 
-  const fortniteGgId = metadata?.fortniteGgId ?? null;
+  // Get the Fortnite.GG ID from the complete cross-reference.
+  const fortniteGgId =
+    metadata?.fortniteGgId ??
+    fortniteGgIdByApiId.get(apiCosmetic.id) ??
+    null;
+
+  // Generate the video URL automatically.
+  const generatedVideoUrl = fortniteGgId
+    ? `https://fnggcdn.com/items/${fortniteGgId}/video.mp4?2`
+    : null;
 
   return {
     id: apiCosmetic.id,
@@ -260,15 +265,7 @@ function mergeApiCosmetic(apiCosmetic) {
 
     Source: metadata?.Source || "Unknown",
 
-    Codename: (() => {
-      const id = apiCosmetic.id || "";
-
-      const match = id.match(
-        /(?:Athena_Commando_[MF]|Character)_(.+)$/i
-      );
-
-      return match ? match[1] : "Unknown";
-    })(),
+    Codename: metadata?.Codename || apiCosmetic.id || "Unknown",
 
     Tags: metadata?.Tags || [],
 
@@ -279,11 +276,9 @@ function mergeApiCosmetic(apiCosmetic) {
       apiCosmetic.images?.smallIcon ||
       "",
 
-    video:
-      metadata?.video ||
-      (fortniteGgId
-        ? `https://fnggcdn.com/items/${fortniteGgId}/video.mp4?2`
-        : null),
+    // Manually assigned video takes priority.
+    // Otherwise, automatically generate the Fortnite.GG URL.
+    video: metadata?.video || generatedVideoUrl,
 
     API: apiCosmetic
   };
