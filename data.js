@@ -107,6 +107,7 @@ const skinMetadata = [
     isEditStyle: false,
     icon: undefined,
     video: undefined,
+    Source: "Item Shop",
 
     
     Tags: [
@@ -158,6 +159,7 @@ const skinMetadata = [
       "Muscular",
       "Agent",
       "Armored",
+      "Helmet",
       "Lightly Armored",
       "Sneakers",
       "Velcro Sneakers",
@@ -174,6 +176,20 @@ const skinMetadata = [
     ],
   },
 
+  {
+    id: "9548",
+
+    isEditStyle: false,
+    Source: "Item Shop",
+
+    Identity: {
+    },
+
+    Tags: [
+      "Non Cell Shaded",
+
+    ],
+  },
   
 
 
@@ -235,17 +251,11 @@ const skinMetadata = [
     isEditStyle: false,
     icon: undefined,
     video: undefined,
-    Chapter: "1",
-    Season: "8",
+ 
     Source: "Item Shop",
-    Codename: "M_AshtonSaltLake",
-    Rarity: "Marvel",
+   
 
-    Identity: {
-      skin_name: "Star-Lord Outfit",
-      rarity: "Marvel",
-    },
-
+  
     Tags: [
       "Armband",
       "Storm Tracker",

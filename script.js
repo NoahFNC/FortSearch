@@ -247,7 +247,10 @@ function mergeApiCosmetic(apiCosmetic) {
 
   return {
     id: apiCosmetic.id,
-    fortniteGgId,
+
+    // Keep both IDs separately identifiable.
+    fortniteApiId: apiCosmetic.id,
+    fortniteGgId: fortniteGgId,
 
     isEditStyle: false,
     entryKey: apiCosmetic.id,
@@ -379,6 +382,7 @@ function buildLocalMetadataDatabase() {
       id: item.id || `local-${normalizeCosmeticName(item.Identity?.skin_name).replace(/\s+/g, "-")}`,
       entryKey: `local-${normalizeCosmeticName(item.Identity?.skin_name)}`,
       fortniteGgId: item.fortniteGgId ?? item.id ?? null,
+      fortniteApiId: null,
       isEditStyle: false,
       Identity: { skin_name: item.Identity?.skin_name || "Unknown Outfit" },
       Tags: item.Tags || [],
@@ -1523,99 +1527,199 @@ function createTimeline() {
   });
 }
 
-function updateTimelineSelection() {
-  document.querySelectorAll(".TimelineHeader").forEach((header) => {
-    header.classList.remove("Active");
-  });
-
-  document.querySelectorAll(".SeasonButton").forEach((button) => {
-    button.classList.remove("Active");
-  });
-
-  document.querySelectorAll(".TimelineCategory").forEach((category) => {
-    const header = category.querySelector(".TimelineHeader");
-
-    const chapter = header.dataset.chapter;
-
-    const chapterValue = isNaN(chapter) ? chapter : Number(chapter);
-
-    if (chapterValue === selectedChapter) {
-      header.classList.add("Active");
-
-      if (selectedSeason !== null) {
-        category.querySelectorAll(".SeasonButton").forEach((button) => {
-          const season = button.dataset.season;
-
-          if (String(season) === String(selectedSeason)) {
-            button.classList.add("Active");
-          }
-        });
-      }
-    }
-  });
-}
-
-// =========================
-// OPEN OVERLAY
-// =========================
 
 function openSkinOverlay(skin) {
   skinOverlay.style.display = "flex";
-  overlaySkinName.textContent = skin.Identity?.skin_name || "Unknown Outfit";
-  overlaySource.textContent = skin.Source || "Not provided by Fortnite-API";
-  overlayIntroduced.textContent = `${skin.Chapter ? `Chapter ${skin.Chapter}` : "Unknown chapter"} ${skin.Season ? `Season ${skin.Season}` : "Unknown season"}`;
+
+  // =========================
+  // BASIC SKIN INFORMATION
+  // =========================
+
+  overlaySkinName.textContent =
+    skin.Identity?.skin_name || "Unknown Outfit";
+
+  overlaySource.textContent =
+    skin.Source || "Not provided by Fortnite-API";
+
+  overlayIntroduced.textContent =
+    `${skin.Chapter ? `Chapter ${skin.Chapter}` : "Unknown chapter"} ${
+      skin.Season ? `Season ${skin.Season}` : "Unknown season"
+    }`;
+
+  // Rarity is displayed ONLY in the original HTML row.
   overlayRarity.textContent = skin.Rarity || "Unknown";
+
   overlayCodename.textContent = formatCodename(skin.Codename);
 
+  // =========================
+  // TAGS
+  // =========================
+
   overlayTags.replaceChildren();
+
   (skin.Tags || []).forEach(tag => {
     const div = document.createElement("div");
+
     div.className = "OverlayTag";
     div.textContent = tag;
+
     overlayTags.appendChild(div);
   });
 
+  // =========================
+  // FORTNITE API INFORMATION
+  // =========================
+
   const apiInfo = document.getElementById("OverlayAPIInfo");
+
   if (apiInfo) {
     apiInfo.replaceChildren();
+
     const api = skin.API || {};
+
+    // Display unavailable values rather than randomly
+    // removing rows from the overlay.
     const details = [
-      ["Fortnite API ID", api.id],
-      ["Type", api.type?.displayValue || api.type?.value],
-      ["Rarity", api.displayRarity || api.rarity?.displayValue],
-      ["Set", api.set?.text || api.set?.value],
-      ["Series", api.series?.value || api.series?.name],
-      ["Added", api.added],
-      ["Last Updated", api.lastUpdate],
-      ["Gameplay Tags", Array.isArray(api.gameplayTags) ? api.gameplayTags.join(", ") : null]
+      [
+        "Fortnite API ID",
+        skin.fortniteApiId || api.id || skin.id
+      ],
+      [
+        "Fortnite.gg ID",
+        skin.fortniteGgId
+      ],
+      [
+        "Type",
+        api.type?.displayValue || api.type?.value
+      ],
+      [
+        "Set",
+        api.set?.text || api.set?.value
+      ],
+      [
+        "Series",
+        api.series?.value || api.series?.name
+      ],
+      [
+        "Added",
+        api.added
+      ],
+      [
+        "Last Updated",
+        api.lastUpdate
+      ],
+      [
+        "Gameplay Tags",
+        Array.isArray(api.gameplayTags)
+          ? api.gameplayTags.join(", ")
+          : null
+      ]
     ];
-    details.forEach(([label,value]) => {
-      if (value === undefined || value === null || value === "") return;
+
+    // Create every information row consistently.
+    details.forEach(([label, value]) => {
       const row = document.createElement("div");
       row.className = "InfoRow";
+
       const title = document.createElement("span");
       title.className = "InfoLabel";
       title.textContent = `${label}: `;
+
       const content = document.createElement("span");
-      content.textContent = String(value);
-      row.append(title,content);
+      content.className = "InfoValue";
+      content.textContent =
+        value !== undefined && value !== null && value !== ""
+          ? String(value)
+          : "Unavailable";
+
+      row.append(title, content);
       apiInfo.appendChild(row);
     });
-    const raw = document.createElement("details");
-    const summary = document.createElement("summary");
-    summary.textContent = "View complete Fortnite API data";
-    const pre = document.createElement("pre");
-    pre.textContent = JSON.stringify(api,null,2);
-    raw.append(summary,pre);
-    apiInfo.appendChild(raw);
+
+    // =========================
+    // COMPLETE API DATA
+    // =========================
+
+    // Only show this dropdown when actual API data exists.
+    const hasApiData =
+      skin.API &&
+      typeof skin.API === "object" &&
+      Object.keys(skin.API).length > 0;
+
+    if (hasApiData) {
+      const raw = document.createElement("details");
+
+      const summary = document.createElement("summary");
+      summary.textContent = "View complete Fortnite API data";
+
+      const pre = document.createElement("pre");
+      pre.textContent = JSON.stringify(skin.API, null, 2);
+
+      raw.append(summary, pre);
+      apiInfo.appendChild(raw);
+    }
   }
+
+  // =========================
+  // VIDEO
+  // =========================
 
   skinVideo.pause();
   skinVideo.src = skin.video || "";
+
   const videoContainer = skinVideo.closest(".OverlayVideo");
-  if (videoContainer) videoContainer.style.display = skin.video ? "block" : "none";
-  if (skin.video) skinVideo.play().catch(() => {});
+
+  if (videoContainer) {
+    videoContainer.style.display = skin.video ? "block" : "none";
+  }
+
+  if (skin.video) {
+    skinVideo.play().catch(() => {});
+  }
 }
+
+function updateTimelineSelection() {
+
+    // Update chapter highlighting.
+    document.querySelectorAll(".TimelineHeader").forEach(header => {
+
+        const chapter = header.dataset.chapter;
+
+        const chapterValue = isNaN(chapter)
+            ? chapter
+            : Number(chapter);
+
+        header.classList.toggle(
+            "Active",
+            chapterValue === selectedChapter
+        );
+
+    });
+
+    // Update season highlighting.
+    document.querySelectorAll(".SeasonButton").forEach(button => {
+
+        const category = button.closest(".TimelineCategory");
+        const header = category?.querySelector(".TimelineHeader");
+
+        if (!header) return;
+
+        const chapter = header.dataset.chapter;
+
+        const chapterValue = isNaN(chapter)
+            ? chapter
+            : Number(chapter);
+
+        const isSelected =
+            chapterValue === selectedChapter &&
+            String(button.dataset.season) === String(selectedSeason);
+
+        button.classList.toggle("Active", isSelected);
+
+    });
+
+}
+
 
 // =========================
 // OPTIMIZED SKIN CARD RENDERER

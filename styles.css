@@ -847,53 +847,58 @@ body::after{
 /* ========================= */
 
 .SkinOverlay {
+    position: fixed;
+    inset: 0;
 
-  position: fixed;
+    width: 100%;
+    height: 100%;
 
-  top: 0;
-  left: 0;
+    background-color: rgba(0,0,0,0.85);
 
-  width: 100%;
-  height: 100%;
+    display: none;
 
-  background-color: rgba(0,0,0,0.85);
+    justify-content: center;
+    align-items: flex-start;
 
-  display: none;
+    z-index: 9999;
 
-  justify-content: center;
-  align-items: center;
+    backdrop-filter: blur(8px);
 
-  z-index: 9999;
+    padding: 30px 20px;
 
-  backdrop-filter: blur(8px);
+    box-sizing: border-box;
 
-  padding: 20px;
-
-  box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .OverlayContent {
+    width: 700px;
+    max-width: 90vw;
 
-  width: 700px;
+    max-height: none;
 
-  max-width: 90vw;
+    background-color: rgb(16,16,16);
 
-  max-height: 90vh;
+    border-radius: 30px;
 
-  background-color: rgb(16,16,16);
+    padding: 25px;
 
-  border-radius: 30px;
+    position: relative;
 
-  padding: 25px;
+    display: flex;
 
-  position: relative;
+    gap: 40px;
 
-  overflow: hidden;
+    align-items: flex-start;
 
-  box-shadow:
-    0px 0px 40px rgba(255,255,255,0.1);
+    overflow: visible;
+
+    box-shadow:
+        0px 0px 40px rgba(255,255,255,0.1);
+
+    flex-shrink: 0;
 }
-
 #OverlaySkinName {
 
   color: white;
@@ -2090,11 +2095,15 @@ body::before {
     }
 
     .OverlayContent {
-        flex-direction: column;
-        gap: 18px;
-        overflow-y: auto;
-        max-height: 88vh;
-        padding: 20px;
+    flex-direction: column;
+    gap: 18px;
+
+    width: 100%;
+    max-width: 100%;
+
+    padding: 20px;
+
+    overflow: visible;
     }
 
     .OverlayVideo,
@@ -2140,4 +2149,35 @@ body::before {
 
 #EnterButton {
     cursor: pointer;
+}
+
+#OverlayAPIInfo {
+    margin-top: 10px;
+    width: 100%;
+}
+
+#OverlayAPIInfo .InfoRow {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    overflow-wrap: anywhere;
+}
+
+#OverlayAPIInfo .InfoLabel {
+    font-weight: bold;
+}
+
+#OverlayAPIInfo details {
+    margin-top: 12px;
+}
+
+#OverlayAPIInfo summary {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#OverlayAPIInfo pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    max-height: 300px;
+    overflow-y: auto;
 }
