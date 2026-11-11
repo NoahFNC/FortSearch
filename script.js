@@ -203,6 +203,73 @@ function normalizeCosmeticName(value) {
     .replace(/[^a-z0-9]+/g, " ").trim();
 }
 
+// NPC outfits are identified by "NPC" appearing anywhere in their codename.
+function isNpcSkin(skin) {
+  return /NPC/i.test(String(skin?.Codename || ""));
+}
+
+// Return the shared codename stem used to associate NPC variants with outfits.
+// For example, AnglePatch_Royal_NPC and AnglePatch_Lodge both resolve to AnglePatch.
+function getCodenameStem(codename) {
+  return String(codename || "")
+    .replace(/^.*?(?:Character_|F_|M_)/i, "")
+    .replace(/_NPC$/i, "")
+    .replace(/_[^_]+$/, "")
+    .toLowerCase();
+}
+
+let npcOutfitIndexSource = null;
+let npcOutfitByCodename = new Map();
+let npcOutfitByStem = new Map();
+
+function buildNpcOutfitIndexes() {
+  if (npcOutfitIndexSource === skins) return;
+
+  npcOutfitIndexSource = skins;
+  npcOutfitByCodename = new Map();
+  npcOutfitByStem = new Map();
+
+  for (const candidate of skins) {
+    if (isNpcSkin(candidate) || candidate.isEditStyle) continue;
+
+    const codename = String(candidate.Codename || "")
+      .replace(/^.*?(?:Character_|F_|M_)/i, "")
+      .toLowerCase();
+    const stem = getCodenameStem(candidate.Codename);
+
+    if (codename && !npcOutfitByCodename.has(codename)) {
+      npcOutfitByCodename.set(codename, candidate);
+    }
+    if (stem && !npcOutfitByStem.has(stem)) {
+      npcOutfitByStem.set(stem, candidate);
+    }
+  }
+}
+
+function getMatchingNpcOutfit(skin) {
+  if (!isNpcSkin(skin)) return null;
+  buildNpcOutfitIndexes();
+
+  const codename = String(skin?.Codename || "")
+    .replace(/^.*?(?:Character_|F_|M_)/i, "")
+    .replace(/_NPC$/i, "")
+    .toLowerCase();
+
+  return npcOutfitByCodename.get(codename) ||
+    npcOutfitByStem.get(getCodenameStem(skin?.Codename)) || null;
+}
+// Add the [NPC] label once, wherever the skin name is displayed.
+function getDisplaySkinName(skin) {
+  const matchingOutfit = getMatchingNpcOutfit(skin);
+  const name = matchingOutfit?.Identity?.skin_name || skin?.Identity?.skin_name || "Unknown Outfit";
+
+  if (!isNpcSkin(skin) || /\[NPC\]/i.test(name)) {
+    return name;
+  }
+
+  return `${name} [NPC]`;
+}
+
 // Removes Fortnite codename prefixes for display.
 function formatCodename(codename) {
   if (!codename) return "Unknown";
@@ -301,18 +368,53 @@ function mergeApiCosmetic(apiCosmetic) {
 // for manually curated edit styles while retaining the parent's API ID/data.
 
 
+// Read the requested variant selector from data.js.
+// Preferred format: editStyle: { channel: "Progressive", tag: "Stage2" }
+function getEditStyleSelector(metadata) {
+  const selector = metadata.editStyle || {};
+
+  return {
+    channel: String(
+      selector.channel ?? metadata.editStyleChannel ?? metadata.variantChannel ?? ""
+    ).trim(),
+    tag: String(
+      selector.tag ?? metadata.editStyleTag ?? metadata.variantTag ?? ""
+    ).trim()
+  };
+}
+
+// Find the exact Fortnite API variant option requested in data.js.
+function findEditStyleVariant(apiCosmetic, metadata) {
+  if (!apiCosmetic || !Array.isArray(apiCosmetic.variants)) return null;
+
+  const { channel, tag } = getEditStyleSelector(metadata);
+  if (!channel || !tag) return null;
+
+  const matchingVariant = apiCosmetic.variants.find(variant =>
+    String(variant.channel || "").toLowerCase() === channel.toLowerCase()
+  );
+
+  if (!matchingVariant || !Array.isArray(matchingVariant.options)) return null;
+
+  const option = matchingVariant.options.find(item =>
+    String(item.tag || "").toLowerCase() === tag.toLowerCase()
+  );
+
+  return option ? { variant: matchingVariant, option } : null;
+}
+
 function buildEditStyleEntries(baseSkins, useFortniteGgIcons = false) {
   return fortSearchMetadata
     .filter(metadata => metadata.isEditStyle)
     .map(metadata => {
-      // Find the parent using the original Fortnite.GG ID.
+      // The edit-style entry and its parent share the Fortnite.GG ID.
       const metadataParentId = String(
         metadata.fortniteGgId ?? metadata.id ?? ""
-      );
+      ).trim();
 
       const parentMetadata = fortSearchMetadata.find(item =>
         !item.isEditStyle &&
-        String(item.fortniteGgId ?? item.id ?? "") === metadataParentId
+        String(item.fortniteGgId ?? item.id ?? "").trim() === metadataParentId
       );
 
       if (!parentMetadata) {
@@ -320,45 +422,87 @@ function buildEditStyleEntries(baseSkins, useFortniteGgIcons = false) {
         return null;
       }
 
-      // Find the corresponding API outfit using its metadata object.
+      // Reuse the parent's API cosmetic after the existing GG -> API mapping.
       const parent = baseSkins.find(skin =>
-        skin.fortniteGgId === metadataParentId
+        String(skin.fortniteGgId ?? "") === metadataParentId
       );
 
       if (!parent) {
         console.warn("Edit style API parent not found:", {
-          style: metadata.Identity?.skin_name,
-          fortniteGgId: metadataParentId
+          fortniteGgId: metadataParentId,
+          editStyle: metadata.editStyle
         });
         return null;
       }
 
-      const styleFortniteGgId = metadata.fortniteGgId ?? metadata.id;
+      const selector = getEditStyleSelector(metadata);
+      const resolvedStyle = findEditStyleVariant(parent.API, metadata);
+      const option = resolvedStyle?.option || null;
+
+      if ((selector.channel || selector.tag) && !option) {
+        console.warn("Fortnite API edit style variant was not found:", {
+          skin: parent.Identity?.skin_name,
+          fortniteGgId: metadataParentId,
+          channel: selector.channel,
+          tag: selector.tag
+        });
+      }
+
+      // API option name/image are used when a selector is supplied.
+      // Existing manual name/icon values remain compatible as fallbacks/overrides.
+      const fallbackStyleName = selector.channel && selector.tag
+        ? "Style"
+        : `${parent.Identity?.skin_name || "Unknown Outfit"}[Style]`;
+
+      const styleName =
+        option?.name ||
+        metadata.Identity?.skin_name ||
+        fallbackStyleName;
+
+      const styleIcon =
+        metadata.icon ||
+        option?.image ||
+        (useFortniteGgIcons && metadataParentId
+          ? `Images/Skins/${metadataParentId}.jpg`
+          : parent.icon);
+
+      const styleFortniteGgId =
+        metadata.fortniteGgId ?? metadata.id ?? parent.fortniteGgId;
+
+      const selectorKey = selector.channel && selector.tag
+        ? `${normalizeCosmeticName(selector.channel)}-${normalizeCosmeticName(selector.tag)}`
+        : normalizeCosmeticName(styleName);
 
       return {
         ...parent,
         id: parent.id,
-        entryKey: `${parent.id}::style::${normalizeCosmeticName(metadata.Identity?.skin_name)}`,
+        entryKey: `${parent.entryKey || parent.id}::style::${selectorKey}`,
         fortniteGgId: styleFortniteGgId,
         isEditStyle: true,
 
         Identity: {
-          skin_name: metadata.Identity?.skin_name || `${parent.Identity.skin_name} [Style]`
+          skin_name: selector.channel && selector.tag
+            ? `${parent.Identity?.skin_name || "Unknown Outfit"}[${styleName}]`
+            : styleName
+        },
+
+        editStyle: {
+          channel: selector.channel || null,
+          tag: selector.tag || null,
+          name: option?.name || null,
+          image: option?.image || null
         },
 
         Tags: metadata.Tags || [],
         SearchableTerms: metadata.SearchableTerms || [],
+        icon: styleIcon,
 
-        icon: useFortniteGgIcons
-          ? (metadata.icon || (styleFortniteGgId
-              ? `Images/Skins/${styleFortniteGgId}.jpg`
-              : parent.icon))
-          : (metadata.icon || parent.icon),
-
+        // A manually supplied Fortnite.GG video always takes priority.
         video: metadata.video || (styleFortniteGgId
           ? `https://fnggcdn.com/items/${styleFortniteGgId}/video.mp4?2`
           : parent.video),
 
+        // Keep the complete parent API cosmetic, including its variants.
         API: parent.API,
         Chapter: metadata.Chapter ?? parent.Chapter,
         Season: metadata.Season ?? parent.Season,
@@ -369,7 +513,6 @@ function buildEditStyleEntries(baseSkins, useFortniteGgIcons = false) {
     })
     .filter(Boolean);
 }
-
 
 
 // Build a small offline database from the manually curated entries in data.js.
@@ -410,10 +553,12 @@ async function loadFortniteCosmetics() {
   if (loadingMessage) loadingMessage.textContent = "Downloading Fortnite cosmetic database...";
 
   try {
-     // Load the Fortnite.GG ID → Fortnite API ID mappings first.
-    await loadFortniteIdCrossReference();
-
-    const response = await fetch(FORTNITE_API_URL);
+    // Start both downloads together to avoid waiting for the cross-reference
+    // file before the much larger cosmetics request can begin.
+    const [_, response] = await Promise.all([
+      loadFortniteIdCrossReference(),
+      fetch(FORTNITE_API_URL)
+    ]);
     if (!response.ok) throw new Error(`Fortnite API returned HTTP ${response.status}`);
 
     const payload = await response.json();
@@ -476,6 +621,7 @@ const skinOverlay = document.getElementById("SkinOverlay");
 const closeButton = document.getElementById("CloseButton");
 
 let showTags = false;
+let showFullBody = false;
 
 let chapterFilterMode = "exact";
 
@@ -529,6 +675,7 @@ aiSearchButton.addEventListener("click", () => {
 
 
 const tagToggle = document.getElementById("TagToggle");
+const fullBodyButton = document.getElementById("FullBodyButton");
 
 const skinHub = document.getElementById("SkinHub");
 
@@ -584,6 +731,19 @@ tagToggle.addEventListener("change", () => {
 
 });
 
+// Switch every result card between its standard icon and API featured image.
+if (fullBodyButton) {
+    fullBodyButton.addEventListener("click", () => {
+        showFullBody = !showFullBody;
+
+        fullBodyButton.classList.toggle("Active", showFullBody);
+        fullBodyButton.setAttribute("aria-pressed", String(showFullBody));
+        skinHub.classList.toggle("FullBodyMode", showFullBody);
+
+        filterSystem();
+    });
+}
+
 chapterFilterModeSelect.addEventListener("change", () => {
   chapterFilterMode = chapterFilterModeSelect.value;
 
@@ -597,47 +757,83 @@ chapterFilterModeSelect.addEventListener("change", () => {
 
 const tagCategories = {
   Accessories: [
-    "Armband",
     "Ammo Pouch",
+    "Armband",
+    "Backpack",
+    "Bandolier",
     "Bow Tie",
     "Bracelet",
     "Bullet Belt",
+    "Canister",
+    "Cape",
     "Chain",
+    "Chaps",
     "Choker",
     "Claws",
+    "Cybernetic Arm",
+    "Dog Tags",
+    "Earbud / Earpiece",
+    "Glow / Reactive Effects",
+    "Greaves",
     "Harness",
-    "Headphones",
     "Holster",
-    "Necklace",
+    "Keychain / Charm",
+    "Lanyard",
+    "Leg Pouch / Drop-Leg Holster",
+    "Mask[Off]",
+    "Medal / Pin",
     "Nails",
+    "Necklace",
+    "Pauldrons",
     "Pouches",
-    "Sash",
-    "Shoulder Bag",
-    "Shotgun Shells",
-    "Storm Tracker",
     "Ring",
+    "Sabatons",
+    "Sash",
+    "Scabbard",
     "Scarf",
+    "Sheath",
+    "Shotgun Shells",
+    "Shoulder Bag",
+    "Storm Tracker",
+    "Tail",
+    "Tattoo[Arm]",
+    "Tattoo[Full Body]",
+    "Tattoo[Leg]",
+    "Tie",
     "Walkman",
     "Watch",
+    "Wings",
+    "Wristband / Sweatband",
   ],
 
   Facewear: [
+    "No Facewear",
+    "Balaclava / Ski Mask",
+    "Blindfold",
+    "Cybernetic Eye",
     "Eyepatch",
     "Face Mask",
     "Gas Mask",
     "Glasses",
+    "Glowing Eyes",
     "Goggles",
+    "Mask",
+    "Monocle",
     "Respirator",
     "Sun Glasses",
+    "Tactical Headset",
     "Visor",
     "Visor Glasses",
   ],
 
   Piercings: [
+    "No Piercings",
+    "Drop[Earrings]",
+    "Hoop[Earrings]",
+    "Lip Ring",
     "Nose Ring",
     "Plug[Earrings]",
-    "Hoop[Earrings]",
-    "Drop[Earrings]",
+    "Stud[Earrings]",
   ],
 
   Age: ["Middle Aged", "Old", "Young", "Young-Adult"],
@@ -646,33 +842,42 @@ const tagCategories = {
 
   Armor: [
     "Armguard",
+    "Armored Underwear",
     "Armored Vest",
+    "Bracers",
     "Chest plate",
     "Cuisses(Thigh Armor)",
+    "Elbow Pads",
+    "Gauntlets",
     "Knee Pads",
     "Knee-Shin Guards",
+    "Muscle Cuirass",
     "Rerebrace(Upper Arm)",
     "Shin Guards",
+    "Shoulder Armor (Single)",
     "Shoulder Pads",
-    "Elbow Pads", 
   ],
 
-  Belt: ["Military Belt", "Tactical Belt", "Obi"],
+  Belt: ["Casual Belt", "Military Belt", "Obi", "Tactical Belt", "Utility Belt"],
 
   Species: [
     "Alien",
     "Android",
+    "Angelic",
     "Animal",
-    "Human",
-    "Robot",
-    "Cyborg",
     "Cybernetic",
-    "Monster",
-    "Undead",
-    "Zombie",
-    "Skeleton",
+    "Cyborg",
+    "Demonic",
     "Ghost",
+    "Human",
+    "Humanoid",
+    "Monster",
+    "Robot",
+    "Skeleton",
+    "Undead",
     "Unique",
+    "Vampiric",
+    "Zombie",
   ],
 
   "Body Type": [
@@ -688,32 +893,57 @@ const tagCategories = {
   "Character Archetype": [
     "Agent",
     "Assassin",
+    "Athlete",
     "Civilian",
+    "Cowboy / Outlaw",
+    "Cyborg / Android",
+    "Demon / Monster",
+    "Gamer",
     "Hunter",
     "Knight",
+    "Knight / Warrior",
+    "Mage / Sorcerer",
     "Mercenary",
+    "Monster Hunter",
     "Ninja",
     "Peely",
+    "Performer",
     "Pilot",
+    "Pilot / Racer",
     "Pirate",
+    "Robot / Mech",
     "Samurai",
     "Scientist",
     "Soldier",
+    "Street Artist / Skater",
     "Superhero",
+    "Survivalist",
     "Villain",
+    "Wastelander",
   ],
 
-  "Facial Hair": ["Beard", "Goatee", "Mustache", "Clean-Shaven"],
+  "Facial Hair": [
+    "No Facial Hair",
+    "Beard",
+    "Clean-Shaven",
+    "Goatee",
+    "Mustache",
+  ],
 
   "Full-Body Garments": [
+    "Coat",
+    "Dress",
+    "Flight Suit",
+    "Gown",
+    "Hazmat Suit",
     "Jumpsuit",
-    "Romper",
-    "Unitard",
     "Leotard",
     "Morph Suit",
+    "Overalls",
+    "Romper",
+    "Trench Coat",
+    "Unitard",
     "Wet Suit",
-    "Hazmat Suit",
-    "Flight Suit",
   ],
 
   "Outfit Style": [
@@ -725,7 +955,7 @@ const tagCategories = {
     "Lightly Armored",
     "Luxury",
     "Medieval",
-    "Mildy Armored",
+    "Mildly Armored",
     "Poor",
     "Spandex",
     "Streetwear",
@@ -735,17 +965,26 @@ const tagCategories = {
   Footwear: [
     "Armored Boots",
     "Barefoot",
+    "Boots",
     "Casual Shoes",
     "Clean Boots",
     "Cleats",
+    "Combat Boots",
+    "Cybernetic Foot",
+    "Flip Flops",
     "Formal Shoes",
+    "Heels",
     "High Heels",
-    "Military Boots",
     "High Military Boots",
+    "Knee-High Boots",
+    "Military Boots",
+    "Platform Boots / Shoes",
     "Sandals",
+    "Slippers",
     "Sneakers",
     "Socks",
     "Strapped Boots",
+    "Thigh-High Boots",
     "Velcro Sneakers",
   ],
 
@@ -756,13 +995,14 @@ const tagCategories = {
     "Boxing Gloves",
     "Clawed Gloves",
     "Clean Gloves",
+    "Cybernetic Hand",
     "Elbow-Length Gloves",
     "Fingerless Gloves",
+    "Gloveless",
     "Leather Gloves",
     "Long Gloves",
-    "Opera Gloves",
     "Mechanical Gloves",
-    "Gloveless",
+    "Opera Gloves",
     "Rubber Gloves",
     "Tactical Gloves",
     "Winter Gloves",
@@ -772,30 +1012,42 @@ const tagCategories = {
     "Afro",
     "Bald",
     "Bangs",
+    "Bob",
     "Braids",
+    "Bun",
     "Buzz Cut",
     "Cornrows",
     "Curly Hair",
+    "Curtain Bangs",
     "Dreads",
     "Fade",
+    "Faux Hawk",
     "Long Hair",
     "Messy Hair",
     "Mohawk",
+    "Mullet",
     "Pig Tails",
+    "Pigtails / Twin Tails",
     "Ponytail",
+    "Shaved Sides / Undercut",
     "Short Hair",
     "Side Part",
+    "Space Buns",
     "Spiky Hair",
     "Straight Hair",
+    "Two-Tone / Dyed Hair",
     "Unique Hairstyle",
     "Wavy Hair",
   ],
 
   Headwear: [
+    "No Headwear",
+    "Animal Ears",
     "Bandana",
     "Beanie",
     "Beret",
     "Cap",
+    "Cap[Backwards]",
     "Cowboy Hat",
     "Crown",
     "Durag",
@@ -803,35 +1055,48 @@ const tagCategories = {
     "Goggles[Off]",
     "Halo",
     "Hat",
-    "Headphones",
     "Headband",
+    "Headphones",
     "Helmet",
-    "Open-Top Helmet",
     "Hood",
-    "Mask",
-    "Open-Top Mask",
+    "Horns / Antlers",
+    "Mask[Side / Top]",
+    "Open-Top Helmet",
+    "Straw Hat",
     "Tiara",
+    "Top Hat",
+    "Veil",
+    "Visor Cap",
     "Visor[Off]",
     "Visor Glasses[Off]",
   ],
 
   Legwear: [
+    "Asymmetrical Legwear",
     "Bell Bottoms",
     "Booty Shorts",
+    "Capri Pants",
     "Cargo Pants",
+    "Chaps",
     "Cuffed Pants",
+    "Cybernetic Leg",
+    "Fishnets",
     "Formal Pants",
     "Jeans",
     "Joggers",
-    "Pajamas",
-    "Short Jeans",
-    "Shorts",
-    "Skirts",
-    "Short Skirts",
-    "Skin Tight Pants",
     "Leather Pants",
+    "Leggings",
     "Long Skirts",
+    "Pajamas",
+    "Ripped Jeans",
+    "Short Jeans",
+    "Short Skirts",
+    "Shorts",
+    "Skin Tight Pants",
+    "Skirts",
     "Sweat Pants",
+    "Tactical Pants",
+    "Tights / Stockings",
     "Track Pants",
     "Underwear",
   ],
@@ -839,33 +1104,21 @@ const tagCategories = {
   Region: [
     "African",
     "Asian",
-    "Middle Eastern",
-    "Norwegian",
     "European",
-    "South American",
+    "Middle Eastern",
     "North American",
-  ],
-
-  Rarity: [
-    "Anime",
-    "Common",
-    "DC",
-    "Epic",
-    "Gaming Legends Series",
-    "Icon Series",
-    "Legendary",
-    "Marvel",
-    "Rare",
-    "Star Wars",
-    "TMNT",
+    "Norwegian",
+    "South American",
   ],
 
   "Skin Tone": [
+    "Pale🧛‍♀️",
     "Light 👍🏻👊🏻",
     "Medium Light 👍🏼👊🏼",
     "Medium 👍🏽👊🏽",
     "Medium Dark 👍🏾👊🏾",
     "Dark 👍🏿👊🏿",
+    "Non-Human Skin Tone",
   ],
 
   Themes: [
@@ -873,57 +1126,88 @@ const tagCategories = {
     "Cyberpunk",
     "Fantasy",
     "Futuristic",
+    "Gothic",
+    "Halloween / Spooky",
     "Horror",
     "Medieval",
     "Military",
+    "Music / DJ",
+    "Mythological",
     "Post-Apocalyptic",
     "Royalty",
     "School",
+    "Sci-Fi",
     "Space",
+    "Sports",
     "Steampunk",
+    "Summer / Beach",
     "Tactical",
+    "Western",
+    "Winter / Holiday",
   ],
 
   "Outfit Era": [
+    "Prehistoric",
+    "Ancient / Classical",
+    "Medieval",
     "1800's",
     "1930's - 1960's",
     "1970's",
     "1980's",
     "1990's",
     "2000's",
+    "2010's",
+    "2020's",
+    "Futuristic",
   ],
 
   Tops: [
+    "Armor Only",
     "Blazer",
+    "Bodysuit",
+    "Camisole",
+    "Cloak",
     "Corset",
     "Crop Top",
     "Cropped Jacket",
     "Dress Shirt",
+    "Flannel / Plaid Shirt",
+    "Halter Top",
     "Hoodie",
     "Jacket",
-    "Long Sleeve",
+    "Jersey / Varsity Jacket",
+    "Kimono / Haori",
     "Leather Jacket",
-    "Muscle Cuirass",
+    "Long Sleeve",
+    "Off-Shoulder",
+    "Peplum Top",
+    "Polo Shirt",
+    "Poncho",
     "Puffy Jacket",
     "Scrunch Sleeve Jacket",
     "Shirtless",
     "Short Sleeve",
     "Skin Tight Chest",
     "Sleeveless",
-    "Sleeveless Jacket",
     "Sleeveless Dress Shirt",
+    "Sleeveless Jacket",
+    "Sports Jersey",
     "Suspenders",
     "Sweater",
-    "Tank Top",
-    "Tracksuit Jacket",
     "T-Shirt",
+    "Tank Top",
     "Toga",
+    "Tracksuit Jacket",
+    "Tube Top",
     "Turtleneck",
     "U-Neck",
     "V-Neck",
+    "Vest",
+    "Windbreaker",
   ],
 
   Weapons: [
+    "No Weapons",
     "Bow",
     "Firearm",
     "Grenades",
@@ -937,6 +1221,7 @@ const tagCategories = {
     "Sword",
   ],
 };
+
 
 
 // =========================
@@ -1033,8 +1318,9 @@ const tagAliases = {
   // =========================
 
   "light armor": ["Lightly Armored"],
-  "Heavy armor": ["Heavy Armored"],
+  "heavy armor": ["Heavy Armored"],
   armor: ["Armored"],
+  "thigh armor": ["Cuisses(Thigh Armor)"],
 
  
 
@@ -1255,110 +1541,111 @@ const allTags = Object.values(tagCategories)
 
 
 
+
 function parseSearchQuery(searchText) {
-  const query = searchText.toLowerCase().trim();
+    const query = searchText.toLowerCase().trim();
 
-  let processedQuery = query;
-
-  Object.entries(tagAliases).forEach(([alias, tags]) => {
-    const regex = new RegExp(`\\b${alias}\\b`, "gi");
-
-    if (regex.test(processedQuery)) {
-      processedQuery = processedQuery.replace(regex, tags.join(" "));
+    // NORMAL SEARCH
+    if (!aiSearchMode) {
+        return {
+            extractedTags: [],
+            nameWords: query.split(/\s+/).filter(Boolean),
+        };
     }
-  });
-  // =========================
-  // NORMAL SEARCH
-  // =========================
 
-  if (!aiSearchMode) {
+    // AI SEARCH
+    let remainingText = query;
+
+    const extractedTags = [];
+
+    // Process longer aliases before shorter aliases.
+    // This prevents "armor" from consuming part of "thigh armor".
+    const sortedAliases = Object.entries(tagAliases)
+        .sort((a, b) => b[0].length - a[0].length);
+
+    sortedAliases.forEach(([alias, tags]) => {
+        const escapedAlias = alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        const regex = new RegExp(`\\b${escapedAlias}\\b`, "gi");
+
+        if (regex.test(remainingText)) {
+            tags.forEach(tag => {
+                if (!extractedTags.includes(tag)) {
+                    extractedTags.push(tag);
+                }
+            });
+
+            // Remove the matched alias so shorter aliases cannot match it.
+            remainingText = remainingText.replace(regex, " ");
+        }
+    });
+
+    // FIND DIRECT TAG MATCHES
+    allTags.forEach(tag => {
+        const escapedTag = tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        const regex = new RegExp(`\\b${escapedTag}\\b`, "i");
+
+        if (regex.test(remainingText)) {
+            if (!extractedTags.includes(tag)) {
+                extractedTags.push(tag);
+            }
+
+            remainingText = remainingText.replace(regex, " ");
+        }
+    });
+
+    // FIND SINGULAR / PLURAL TAG MATCHES
+    const leftoverWords = remainingText.split(/\s+/).filter(Boolean);
+
+    for (let i = 0; i < leftoverWords.length; i++) {
+        const detectedTags = findTag(leftoverWords[i]);
+
+        if (detectedTags) {
+            const tags = Array.isArray(detectedTags)
+                ? detectedTags
+                : [detectedTags];
+
+            tags.forEach(tag => {
+                if (!extractedTags.includes(tag)) {
+                    extractedTags.push(tag);
+                }
+            });
+
+            leftoverWords[i] = "";
+        }
+    }
+
+    // FIND SKIN NAMES
+    const nameWords = [];
+    const remainingWords = leftoverWords.filter(Boolean);
+
+    for (let start = 0; start < remainingWords.length; start++) {
+        for (let end = remainingWords.length; end > start; end--) {
+            const phrase = remainingWords.slice(start, end).join(" ");
+
+            const possibleSkin = skins.find(
+                skin => skin.Identity?.skin_name?.toLowerCase() === phrase
+            );
+
+            if (possibleSkin) {
+                nameWords.push(phrase);
+
+                for (let i = start; i < end; i++) {
+                    remainingWords[i] = "";
+                }
+
+                break;
+            }
+        }
+    }
+
     return {
-      extractedTags: [],
-      nameWords: query.split(/\s+/).filter(Boolean),
+        extractedTags,
+        nameWords: nameWords.filter(Boolean),
     };
-  }
-
-  // =========================
-  // AI SEARCH
-  // =========================
-
-  let remainingText = processedQuery;
-
-  const extractedTags = [];
-
-  // Find tags first
-
-  allTags.forEach((tag) => {
-    const lowerTag = tag.toLowerCase();
-
-    const regex = new RegExp(`\\b${lowerTag}\\b`, "i");
-
-    if (regex.test(remainingText)) {
-      extractedTags.push(tag);
-
-      remainingText = remainingText.replace(regex, " ");
-    }
-  });
-
-  // Remaining words
-
-  const leftoverWords = remainingText.split(/\s+/).filter(Boolean);
-
-  // Check remaining words for singular/plural tags
-
-  for (let i = 0; i < leftoverWords.length; i++) {
-    const detectedTags = findTag(leftoverWords[i]);
-
-    if (detectedTags) {
-      const tags = Array.isArray(detectedTags) ? detectedTags : [detectedTags];
-
-      tags.forEach((tag) => {
-        if (!extractedTags.includes(tag)) {
-          extractedTags.push(tag);
-        }
-      });
-
-      leftoverWords[i] = "";
-    }
-  }
-
-  const nameWords = [];
-
-  // Remove words that became tags
-  const remainingWords = leftoverWords.filter(Boolean);
-
-  // Check every possible word combination
-  for (let start = 0; start < remainingWords.length; start++) {
-    for (let end = remainingWords.length; end > start; end--) {
-      const phrase = remainingWords.slice(start, end).join(" ");
-
-      const possibleSkin = skins.find(
-        (skin) => skin.Identity?.skin_name?.toLowerCase() === phrase,
-      );
-
-      if (possibleSkin) {
-        nameWords.push(phrase);
-
-        // Remove used words
-        for (let i = start; i < end; i++) {
-          remainingWords[i] = "";
-        }
-
-        break;
-      }
-    }
-  }
-
-  
-
-  // Remove blanks
-  const cleanedNameWords = nameWords.filter(Boolean);
-
-  return {
-    extractedTags,
-    nameWords: cleanedNameWords,
-  };
 }
+
 
 // =========================
 // CREATE TAG CATEGORIES
@@ -1535,8 +1822,7 @@ function openSkinOverlay(skin) {
   // BASIC SKIN INFORMATION
   // =========================
 
-  overlaySkinName.textContent =
-    skin.Identity?.skin_name || "Unknown Outfit";
+  overlaySkinName.textContent = getDisplaySkinName(skin);
 
   overlaySource.textContent =
     skin.Source || "Not provided by Fortnite-API";
@@ -1665,16 +1951,59 @@ function openSkinOverlay(skin) {
   // =========================
 
   skinVideo.pause();
-  skinVideo.src = skin.video || "";
 
   const videoContainer = skinVideo.closest(".OverlayVideo");
+  const npcFeaturedImage =
+    skin.API?.images?.featured || skin.icon || "";
 
-  if (videoContainer) {
-    videoContainer.style.display = skin.video ? "block" : "none";
-  }
+  // NPC outfits do not have Fortnite.gg video IDs. Show their
+  // Fortnite API featured artwork in the overlay instead.
+  if (isNpcSkin(skin)) {
+    let npcImage = videoContainer?.querySelector(".OverlayNPCFeaturedImage");
 
-  if (skin.video) {
-    skinVideo.play().catch(() => {});
+    if (videoContainer && !npcImage) {
+      npcImage = document.createElement("img");
+      npcImage.className = "OverlayNPCFeaturedImage";
+      npcImage.alt = `${getDisplaySkinName(skin)} featured artwork`;
+      npcImage.style.width = "100%";
+      npcImage.style.height = "100%";
+      npcImage.style.maxHeight = "100%";
+      npcImage.style.objectFit = "contain";
+      npcImage.style.display = "block";
+      videoContainer.appendChild(npcImage);
+    }
+
+    if (npcImage) {
+      npcImage.src = npcFeaturedImage;
+      npcImage.alt = `${getDisplaySkinName(skin)} featured artwork`;
+      npcImage.style.display = npcFeaturedImage ? "block" : "none";
+    }
+
+    skinVideo.removeAttribute("src");
+    skinVideo.load();
+    skinVideo.style.display = "none";
+
+    if (videoContainer) {
+      videoContainer.style.display = npcFeaturedImage ? "block" : "none";
+    }
+  } else {
+    const npcImage =
+      videoContainer?.querySelector(".OverlayNPCFeaturedImage");
+
+    if (npcImage) {
+      npcImage.style.display = "none";
+    }
+
+    skinVideo.style.display = "";
+    skinVideo.src = skin.video || "";
+
+    if (videoContainer) {
+      videoContainer.style.display = skin.video ? "block" : "none";
+    }
+
+    if (skin.video) {
+      skinVideo.play().catch(() => {});
+    }
   }
 }
 
@@ -1726,142 +2055,211 @@ function updateTimelineSelection() {
 // =========================
 
 let skinRenderVersion = 0;
-
+let activeSkinRenderObserver = null;
+let activeSkinScrollHandler = null;
+let activeCardVideo = null;
 const SKIN_RENDER_BATCH_SIZE = 60;
+const SKIN_RENDER_PREFETCH_DISTANCE = 3200;
+const CARD_VIDEO_HOVER_DELAY_MS = 120;
 
 function displaySkins(skinArray) {
+  const currentRender = ++skinRenderVersion;
+  if (activeCardVideo) {
+    activeCardVideo.pause();
+    activeCardVideo.removeAttribute("src");
+    activeCardVideo.load();
+    activeCardVideo = null;
+  }
+  if (activeSkinRenderObserver) {
+    activeSkinRenderObserver.disconnect();
+    activeSkinRenderObserver = null;
+  }
+  if (activeSkinScrollHandler) {
+    window.removeEventListener("scroll", activeSkinScrollHandler);
+    activeSkinScrollHandler = null;
+  }
 
-    // Cancel any previous rendering operation.
-    const currentRender = ++skinRenderVersion;
+  skinHub.replaceChildren();
 
-    skinHub.replaceChildren();
+  if (!skinArray.length) {
+    const empty = document.createElement("p");
+    empty.className = "NoResults";
+    empty.textContent = "No matching skins found.";
+    skinHub.appendChild(empty);
+    return;
+  }
 
-    if (!skinArray.length) {
-        const empty = document.createElement("p");
-        empty.className = "NoResults";
-        empty.textContent = "No matching skins found.";
-        skinHub.appendChild(empty);
-        return;
-    }
+  let currentIndex = 0;
+  let batchScheduled = false;
+  const sentinel = document.createElement("div");
+  sentinel.className = "SkinRenderSentinel";
+  sentinel.setAttribute("aria-hidden", "true");
+  sentinel.style.cssText = "flex: 1 0 100%; height: 1px; pointer-events: none;";
 
-    let currentIndex = 0;
+  function makeCard(skin) {
+    const card = document.createElement("div");
+    card.className = "SkinCard";
+    card.addEventListener("click", () => openSkinOverlay(skin));
 
-    function renderBatch() {
+    const displayName = getDisplaySkinName(skin);
+    const name = document.createElement("h3");
+    name.className = "SkinName";
+    name.textContent = displayName;
 
-        // A newer search/filter may have started.
-        if (currentRender !== skinRenderVersion) return;
+    const image = document.createElement("img");
+    const standardIcon = skin.icon || "";
+    const featuredIcon = skin.API?.images?.featured || "";
+    const shouldUseFeaturedImage =
+      isNpcSkin(skin) || (showFullBody && !skin.isEditStyle);
+    const preferredImage = shouldUseFeaturedImage && featuredIcon
+      ? featuredIcon
+      : standardIcon;
 
-        const fragment = document.createDocumentFragment();
+    image.alt = displayName;
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.fetchPriority = "low";
+    image.onerror = () => {
+      if (image.dataset.fallbackUsed !== "true" && standardIcon && preferredImage !== standardIcon) {
+        image.dataset.fallbackUsed = "true";
+        image.src = standardIcon;
+      } else {
+        image.alt = "Image unavailable";
+      }
+    };
+    image.src = preferredImage;
+    card.append(name, image);
 
-        const batchEnd = Math.min(
-            currentIndex + SKIN_RENDER_BATCH_SIZE,
-            skinArray.length
-        );
+    if (skin.video) {
+      let preview = null;
+      let hoverTimer = null;
+      let isHovered = false;
 
-        for (; currentIndex < batchEnd; currentIndex++) {
+      card.addEventListener("mouseenter", () => {
+        isHovered = true;
+        if (hoverTimer !== null) clearTimeout(hoverTimer);
+        hoverTimer = setTimeout(() => {
+          hoverTimer = null;
+          if (!isHovered) return;
 
-            const skin = skinArray[currentIndex];
+          if (activeCardVideo && activeCardVideo !== preview) {
+            activeCardVideo.pause();
+            activeCardVideo.style.opacity = "0";
+            activeCardVideo.removeAttribute("src");
+            activeCardVideo.load();
+          }
 
-            const card = document.createElement("div");
-            card.className = "SkinCard";
-
-            // Clicking the card still opens its full information overlay.
-            card.addEventListener("click", () => {
-                openSkinOverlay(skin);
+          if (!preview) {
+            preview = document.createElement("video");
+            preview.className = "SkinHoverVideo";
+            preview.muted = true;
+            preview.loop = true;
+            preview.playsInline = true;
+            preview.preload = "none";
+            preview.setAttribute("playsinline", "");
+            preview.style.opacity = "0";
+            preview.addEventListener("playing", () => {
+              if (isHovered) preview.style.opacity = "1";
             });
+            card.appendChild(preview);
+          }
 
-            const name = document.createElement("h3");
-            name.className = "SkinName";
-            name.textContent =
-                skin.Identity?.skin_name || "Unknown Outfit";
+          activeCardVideo = preview;
+          if (!preview.src) preview.src = skin.video;
+          const playback = preview.play();
+          if (playback && typeof playback.catch === "function") playback.catch(() => {});
+        }, CARD_VIDEO_HOVER_DELAY_MS);
+      });
 
-            const image = document.createElement("img");
-
-            image.src = skin.icon || "";
-            image.alt =
-                skin.Identity?.skin_name || "Fortnite outfit";
-
-            image.loading = "lazy";
-            image.decoding = "async";
-
-            image.onerror = () => {
-                image.alt = "Image unavailable";
-            };
-
-            card.append(name, image);
-
-            // Create the video ONLY when the user hovers over this card.
-            if (skin.video) {
-
-                let preview = null;
-
-                card.addEventListener("mouseenter", () => {
-
-                    if (!preview) {
-
-                        preview = document.createElement("video");
-
-                        preview.className = "SkinHoverVideo";
-                        preview.muted = true;
-                        preview.loop = true;
-                        preview.playsInline = true;
-                        preview.preload = "none";
-
-                        preview.src = skin.video;
-
-                        card.appendChild(preview);
-                    }
-
-                    preview.play().catch(() => {});
-                });
-
-                card.addEventListener("mouseleave", () => {
-
-                    if (preview) {
-                        preview.pause();
-
-                        try {
-                            preview.currentTime = 0;
-                        } catch (_) {}
-                    }
-                });
-            }
-
-            // Preserve the Show Tags feature.
-            if (showTags && (skin.Tags || []).length) {
-
-                const tags = document.createElement("div");
-                tags.className = "CardTags";
-
-                skin.Tags.forEach(tag => {
-
-                    const element = document.createElement("span");
-
-                    element.className = "CardTag";
-                    element.textContent = tag;
-
-                    tags.appendChild(element);
-                });
-
-                card.appendChild(tags);
-            }
-
-            fragment.appendChild(card);
+      card.addEventListener("mouseleave", () => {
+        isHovered = false;
+        if (hoverTimer !== null) {
+          clearTimeout(hoverTimer);
+          hoverTimer = null;
         }
-
-        // Add this batch to the page.
-        skinHub.appendChild(fragment);
-
-        // Yield control to the browser before rendering the next batch.
-        if (currentIndex < skinArray.length) {
-            requestAnimationFrame(renderBatch);
+        if (preview) {
+          preview.pause();
+          preview.style.opacity = "0";
+          try { preview.currentTime = 0; } catch (_) {}
         }
+      });
     }
 
-    // Start rendering the first batch.
-    requestAnimationFrame(renderBatch);
-}
+    if (showTags && (skin.Tags || []).length) {
+      const tags = document.createElement("div");
+      tags.className = "CardTags";
+      skin.Tags.forEach(tag => {
+        const element = document.createElement("span");
+        element.className = "CardTag";
+        element.textContent = tag;
+        tags.appendChild(element);
+      });
+      card.appendChild(tags);
+    }
 
+    return card;
+  }
+
+  function scheduleNextBatch() {
+    if (batchScheduled || currentRender !== skinRenderVersion) return;
+    batchScheduled = true;
+    if (activeSkinRenderObserver) activeSkinRenderObserver.unobserve(sentinel);
+    requestAnimationFrame(() => {
+      batchScheduled = false;
+      renderBatch();
+    });
+  }
+
+  function renderBatch() {
+    if (currentRender !== skinRenderVersion) return;
+
+    const fragment = document.createDocumentFragment();
+    const batchEnd = Math.min(currentIndex + SKIN_RENDER_BATCH_SIZE, skinArray.length);
+    for (; currentIndex < batchEnd; currentIndex++) {
+      fragment.appendChild(makeCard(skinArray[currentIndex]));
+    }
+    skinHub.appendChild(fragment);
+
+    if (currentIndex < skinArray.length) {
+      if (!sentinel.isConnected) skinHub.appendChild(sentinel);
+      const nearEnd = sentinel.getBoundingClientRect().top <=
+        window.innerHeight + SKIN_RENDER_PREFETCH_DISTANCE;
+
+      if (nearEnd || !activeSkinRenderObserver) {
+        scheduleNextBatch();
+      } else {
+        activeSkinRenderObserver.observe(sentinel);
+      }
+    } else {
+      sentinel.remove();
+      if (activeSkinRenderObserver) {
+        activeSkinRenderObserver.disconnect();
+        activeSkinRenderObserver = null;
+      }
+      if (activeSkinScrollHandler) {
+        window.removeEventListener("scroll", activeSkinScrollHandler);
+        activeSkinScrollHandler = null;
+      }
+    }
+  }
+
+  if ("IntersectionObserver" in window) {
+    activeSkinRenderObserver = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) scheduleNextBatch();
+    }, { rootMargin: `${SKIN_RENDER_PREFETCH_DISTANCE}px 0px` });
+  }
+
+  activeSkinScrollHandler = () => {
+    if (currentRender !== skinRenderVersion || !sentinel.isConnected) return;
+    if (sentinel.getBoundingClientRect().top <=
+        window.innerHeight + SKIN_RENDER_PREFETCH_DISTANCE) {
+      scheduleNextBatch();
+    }
+  };
+  window.addEventListener("scroll", activeSkinScrollHandler, { passive: true });
+
+  requestAnimationFrame(renderBatch);
+}
 // =========================
 // FILTER SYSTEM
 // =========================
