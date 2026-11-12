@@ -2082,25 +2082,29 @@ body::before {
 }
 
 @media (max-width: 650px) {
+    body {
+        font-size: 16px;
+    }
+
     .Header {
         width: calc(100% - 32px);
         box-sizing: border-box;
-        gap: 12px;
-        padding: 10px 14px;
+        gap: 14px;
+        padding: 14px 16px;
     }
 
     .PageTitle h1 {
-        font-size: 34px;
+        font-size: clamp(36px, 10vw, 44px);
     }
 
     .SponserTag {
-        gap: 6px;
-        font-size: 12px;
+        gap: 8px;
+        font-size: 14px;
     }
 
     .CCLogo {
-        width: 30px;
-        height: 30px;
+        width: 36px;
+        height: 36px;
     }
 
     .TopSection {
@@ -2116,7 +2120,33 @@ body::before {
     .TimelinePanel {
         width: 100%;
         flex: none;
-        padding: 20px;
+        padding: 24px;
+    }
+
+    .PanelTitle,
+    .HubTitle {
+        font-size: 27px;
+    }
+
+    .TagMatchModeControl label,
+    .TagMatchModeControl select,
+    #ChapterFilterMode,
+    .FilterModeTitle,
+    .TimelineHeader,
+    .SeasonButton,
+    .FilterTag {
+        font-size: 16px;
+    }
+
+    .TagMatchModeControl select,
+    #ChapterFilterMode {
+        min-height: 48px;
+        padding: 12px 14px;
+    }
+
+    .FilterTag,
+    .SeasonButton {
+        padding: 12px 14px;
     }
 
     .SearchBarRow {
@@ -2126,13 +2156,35 @@ body::before {
 
     .AISearchButton {
         width: 100%;
-        height: 44px;
+        height: 52px;
+        font-size: 20px;
+    }
+
+    #SearchBar {
+        min-height: 52px;
+        box-sizing: border-box;
+        padding: 12px 16px;
+        font-size: 18px;
+    }
+
+    .AISearchPanel {
+        padding: 18px;
+    }
+
+    .AISearchTitle {
+        font-size: 20px;
+    }
+
+    .AISearchResults,
+    .WelcomeText {
+        font-size: 17px;
+        line-height: 1.65;
     }
 
     .SkinHubContainer {
         width: calc(100% - 32px);
         box-sizing: border-box;
-        padding: 18px;
+        padding: 22px;
         margin-top: 24px;
     }
 
@@ -2142,7 +2194,46 @@ body::before {
     }
 
     .SkinCard {
-        width: min(100%, 250px);
+        width: 100%;
+        max-width: 360px;
+    }
+
+    .SkinCard img {
+        height: 380px;
+    }
+
+    .SkinName {
+        font-size: 22px;
+        line-height: 1.25;
+    }
+
+    .CardTag {
+        font-size: 14px;
+        padding: 7px 9px;
+    }
+
+    .FullBodyButton {
+        min-height: 48px;
+        padding: 12px 18px;
+        font-size: 19px;
+    }
+
+    .TagToggle {
+        font-size: 16px;
+    }
+
+    .Slider {
+        width: 64px;
+        height: 34px;
+    }
+
+    .Slider::before {
+        width: 28px;
+        height: 28px;
+    }
+
+    .TagToggle input:checked + .Slider::before {
+        transform: translateX(30px);
     }
 
     .HubHeader {
@@ -2156,7 +2247,7 @@ body::before {
 
     .IntroDescription,
     .IntroSubtitle {
-        font-size: 18px;
+        font-size: 20px;
     }
 
     .StartLogo {
@@ -2187,6 +2278,10 @@ body::before {
 
     .InfoLabel {
         font-size: 25px;
+    }
+
+    .InfoValue {
+        font-size: 18px;
     }
 }
 /* Keep intro background effects behind the content */
