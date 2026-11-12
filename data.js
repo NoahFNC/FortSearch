@@ -114,12 +114,13 @@ const skinMetadata = [
       "Cyborg",
       "Cybernetic",
       "Muscular",
-      "Dark 👍🏿👊🏿",
+      "Medium Dark 👍🏾👊🏾",
       "Non Cell Shaded",
       "Dreads",
       "Short Hair",
       "Beard",
       "Mustache",
+      "Ponytail",
       "Beret",
       "Visor Glasses",
       "No Piercings",
@@ -153,6 +154,92 @@ const skinMetadata = [
       "North American"
     ]
   },
+
+
+{
+    id: "343",
+
+    isEditStyle: false,
+    icon: undefined,
+    video: undefined,
+    Source: "Item Shop",
+
+    Tags: [
+      "Male",
+      "Young-Adult",
+      "Human",
+      "Humanoid",
+      "Average",
+      "Light 👍🏻👊🏻",
+      "Non Cell Shaded",
+      "Short Hair",
+      "Spiky Hair",
+      "No Facial Hair",
+      "Headband",
+      "No Facewear",
+      "No Piercings",
+      "Jacket",
+      "Hoodie",
+      "Long Sleeve",
+      "Fingerless Gloves",
+      "Joggers",
+      "Sneakers",
+      "Velcro Sneakers",
+      "No Weapons",
+      "Streetwear",
+      "2010's",
+      "2020's",
+      "Gamer",
+      "Ninja",
+      "North American"
+    ]
+  },
+
+  {
+    id: "251",
+
+    isEditStyle: false,
+    icon: undefined,
+    video: undefined,
+    Source: "Item Shop",
+
+    Tags: [
+      "Male",
+      "Young-Adult",
+      "Human",
+      "Humanoid",
+      "Slim Muscular",
+      "Medium Dark 👍🏾👊🏾",
+      "Non Cell Shaded",
+      "Braids",
+      "Short Hair",
+      "No Facial Hair",
+      "No Headwear",
+      "No Facewear",
+      "No Piercings",
+      "Shirtless",
+      "Necklace",
+      "Chain",
+      "Tattoo[Arm]",
+      "Tattoo[Torso]",
+      "Gloveless",
+      "Ring",
+      "Cargo Pants",
+      "Underwear",
+      "Pouches",
+      "Sneakers",
+      "No Weapons",
+      "Streetwear",
+      "Casual",
+      "Music / DJ",
+      "2010's",
+      "2020's",
+      "Performer",
+      "North American"
+    ]
+
+  },
+
 
 
 

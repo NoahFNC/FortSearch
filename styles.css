@@ -858,6 +858,11 @@ body::after{
 
 }
 
+/* Zoom featured full-body artwork within the existing card image area. */
+.SkinHub.FullBodyMode .SkinCard img {
+    transform: scale(1.4);
+}
+
 .SkinName {
 
   color: white;
