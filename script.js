@@ -2209,7 +2209,7 @@ function displaySkins(skinArray) {
           touchHeld = true;
           suppressNextClick = true;
           startPreview();
-        }, 450);
+        }, 100);
       }, { passive: true });
 
       const finishTouch = () => {
