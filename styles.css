@@ -2387,6 +2387,34 @@ body::before {
 }
 
 @media (max-width: 650px) {
+    .SkinHub {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        justify-content: stretch;
+        gap: 10px;
+    }
+
+    .SkinCard {
+        width: auto;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .SkinCard img {
+        height: clamp(130px, 38vw, 180px);
+    }
+
+    .SkinName {
+        margin: 8px 4px;
+        font-size: 14px;
+        line-height: 1.2;
+        overflow-wrap: anywhere;
+    }
+
+    .SkinHub.FullBodyMode .SkinCard img {
+        transform: scale(1.6);
+    }
+
     .SkinOverlay {
         align-items: flex-start;
         padding: max(10px, env(safe-area-inset-top)) 10px max(14px, env(safe-area-inset-bottom));
