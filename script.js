@@ -619,6 +619,7 @@ const overlayTags = document.getElementById("OverlayTags");
 const skinVideo = document.getElementById("SkinVideo");
 const skinOverlay = document.getElementById("SkinOverlay");
 const closeButton = document.getElementById("CloseButton");
+const backToTopButton = document.getElementById("BackToTopButton");
 
 let showTags = false;
 let showFullBody = false;
@@ -700,6 +701,9 @@ let manualTagMatchMode = "all";
 
 function closeSkinOverlay() {
   skinOverlay.style.display = "none";
+  if (backToTopButton) {
+    backToTopButton.classList.toggle("Visible", window.scrollY > 500);
+  }
   skinVideo.pause();
   skinVideo.src = "";
   const videoContainer = skinVideo.closest(".OverlayVideo");
@@ -707,6 +711,19 @@ function closeSkinOverlay() {
 }
 
 closeButton.addEventListener("click", closeSkinOverlay);
+
+if (backToTopButton) {
+  const updateBackToTopVisibility = () => {
+    const overlayOpen = skinOverlay.style.display === "flex";
+    backToTopButton.classList.toggle("Visible", window.scrollY > 500 && !overlayOpen);
+  };
+
+  window.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
+  backToTopButton.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  updateBackToTopVisibility();
+}
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && skinOverlay.style.display === "flex") {
@@ -1817,6 +1834,7 @@ function createTimeline() {
 
 function openSkinOverlay(skin) {
   skinOverlay.style.display = "flex";
+  if (backToTopButton) backToTopButton.classList.remove("Visible");
 
   // =========================
   // BASIC SKIN INFORMATION
