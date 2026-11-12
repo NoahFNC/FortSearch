@@ -2099,7 +2099,15 @@ function displaySkins(skinArray) {
   function makeCard(skin) {
     const card = document.createElement("div");
     card.className = "SkinCard";
-    card.addEventListener("click", () => openSkinOverlay(skin));
+    let suppressNextClick = false;
+    card.addEventListener("click", () => {
+      if (suppressNextClick) {
+        suppressNextClick = false;
+        return;
+      }
+      openSkinOverlay(skin);
+    });
+    card.addEventListener("contextmenu", event => event.preventDefault());
 
     const displayName = getDisplaySkinName(skin);
     const name = document.createElement("h3");
@@ -2119,6 +2127,7 @@ function displaySkins(skinArray) {
     image.loading = "lazy";
     image.decoding = "async";
     image.fetchPriority = "low";
+    image.draggable = false;
     image.onerror = () => {
       if (image.dataset.fallbackUsed !== "true" && standardIcon && preferredImage !== standardIcon) {
         image.dataset.fallbackUsed = "true";
@@ -2134,6 +2143,44 @@ function displaySkins(skinArray) {
       let preview = null;
       let hoverTimer = null;
       let isHovered = false;
+      let touchTimer = null;
+      let touchHeld = false;
+
+      const startPreview = () => {
+        if (activeCardVideo && activeCardVideo !== preview) {
+          activeCardVideo.pause();
+          activeCardVideo.style.opacity = "0";
+          activeCardVideo.removeAttribute("src");
+          activeCardVideo.load();
+        }
+
+        if (!preview) {
+          preview = document.createElement("video");
+          preview.className = "SkinHoverVideo";
+          preview.muted = true;
+          preview.loop = true;
+          preview.playsInline = true;
+          preview.preload = "none";
+          preview.setAttribute("playsinline", "");
+          preview.style.opacity = "0";
+          preview.addEventListener("playing", () => {
+            if (isHovered || touchHeld) preview.style.opacity = "1";
+          });
+          card.appendChild(preview);
+        }
+
+        activeCardVideo = preview;
+        if (!preview.src) preview.src = skin.video;
+        const playback = preview.play();
+        if (playback && typeof playback.catch === "function") playback.catch(() => {});
+      };
+
+      const stopPreview = () => {
+        if (!preview) return;
+        preview.pause();
+        preview.style.opacity = "0";
+        try { preview.currentTime = 0; } catch (_) {}
+      };
 
       card.addEventListener("mouseenter", () => {
         isHovered = true;
@@ -2142,32 +2189,7 @@ function displaySkins(skinArray) {
           hoverTimer = null;
           if (!isHovered) return;
 
-          if (activeCardVideo && activeCardVideo !== preview) {
-            activeCardVideo.pause();
-            activeCardVideo.style.opacity = "0";
-            activeCardVideo.removeAttribute("src");
-            activeCardVideo.load();
-          }
-
-          if (!preview) {
-            preview = document.createElement("video");
-            preview.className = "SkinHoverVideo";
-            preview.muted = true;
-            preview.loop = true;
-            preview.playsInline = true;
-            preview.preload = "none";
-            preview.setAttribute("playsinline", "");
-            preview.style.opacity = "0";
-            preview.addEventListener("playing", () => {
-              if (isHovered) preview.style.opacity = "1";
-            });
-            card.appendChild(preview);
-          }
-
-          activeCardVideo = preview;
-          if (!preview.src) preview.src = skin.video;
-          const playback = preview.play();
-          if (playback && typeof playback.catch === "function") playback.catch(() => {});
+          startPreview();
         }, CARD_VIDEO_HOVER_DELAY_MS);
       });
 
@@ -2177,10 +2199,39 @@ function displaySkins(skinArray) {
           clearTimeout(hoverTimer);
           hoverTimer = null;
         }
-        if (preview) {
-          preview.pause();
-          preview.style.opacity = "0";
-          try { preview.currentTime = 0; } catch (_) {}
+        stopPreview();
+      });
+
+      card.addEventListener("touchstart", () => {
+        touchHeld = false;
+        touchTimer = setTimeout(() => {
+          touchTimer = null;
+          touchHeld = true;
+          suppressNextClick = true;
+          startPreview();
+        }, 450);
+      }, { passive: true });
+
+      const finishTouch = () => {
+        if (touchTimer !== null) {
+          clearTimeout(touchTimer);
+          touchTimer = null;
+        }
+        if (touchHeld) {
+          touchHeld = false;
+          stopPreview();
+          // Also suppress the synthetic click some browsers send after a hold.
+          setTimeout(() => { suppressNextClick = false; }, 700);
+        }
+      };
+
+      card.addEventListener("touchend", finishTouch, { passive: true });
+      card.addEventListener("touchcancel", finishTouch, { passive: true });
+      card.addEventListener("touchmove", () => {
+        // Moving the finger means the user is scrolling, not requesting a preview.
+        if (!touchHeld && touchTimer !== null) {
+          clearTimeout(touchTimer);
+          touchTimer = null;
         }
       });
     }
